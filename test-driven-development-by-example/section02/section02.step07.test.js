@@ -17,7 +17,7 @@ class Dollar {
   }
 }
 
-test('Dollar Multifly Test (Step 7)', () => {
+test.skip('Dollar Multifly Test (Step 7)', () => {
   const five_dollars = new Dollar(5);
   const product_1 = five_dollars.multifly(3);
   expect(product_1.amount).toBe(15);
