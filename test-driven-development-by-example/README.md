@@ -14,7 +14,7 @@
   [1장 다중 통화를 지원하는 Money 객체](./section01/README.md)  
   [2장 타락한 객체](./section02/README.md)  
   [3장 모두를 위한 평등](./section03/README.md)  
-  4장 프라이버시  
+  [4장 프라이버시](./section04/README.md)  
   5장 솔직히 말하자면  
   6장 돌아온 ‘모두를 위한 평등’  
   7장 사과와 오렌지  
