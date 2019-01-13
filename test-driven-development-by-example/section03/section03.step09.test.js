@@ -20,7 +20,7 @@ class Dollar {
   }
 }
 
-test('Dollar Equal Test (Step 9)', () => {
+test.skip('Dollar Equal Test (Step 9)', () => {
   expect( (new Dollar(5)).equals(new Dollar(5)) ).toBeTruthy();
   expect( (new Dollar(5)).equals(new Dollar(6)) ).toBeFalsy();
 });
