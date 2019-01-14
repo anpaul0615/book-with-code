@@ -15,7 +15,7 @@
   [2장 타락한 객체](./section02/README.md)  
   [3장 모두를 위한 평등](./section03/README.md)  
   [4장 프라이버시](./section04/README.md)  
-  5장 솔직히 말하자면  
+  [5장 솔직히 말하자면](./section05/README.md)  
   6장 돌아온 ‘모두를 위한 평등’  
   7장 사과와 오렌지  
   8장 객체 만들기  
