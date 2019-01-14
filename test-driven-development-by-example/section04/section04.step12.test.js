@@ -14,7 +14,7 @@ class Dollar {
   }
 }
 
-test('Dollar Multifly + Equal Test (Step 12)', () => {
+test.skip('Dollar Multifly + Equal Test (Step 12)', () => {
   const five_dollars = new Dollar(5);
   expect( five_dollars.multifly(3) ).toEqual(new Dollar(15));
   expect( five_dollars.multifly(5) ).toEqual(new Dollar(25));
