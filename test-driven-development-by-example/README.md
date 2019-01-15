@@ -16,7 +16,7 @@
   [3장 모두를 위한 평등](./section03/README.md)  
   [4장 프라이버시](./section04/README.md)  
   [5장 솔직히 말하자면](./section05/README.md)  
-  6장 돌아온 ‘모두를 위한 평등’  
+  [6장 돌아온 '모두를 위한 평등'](./section06/README.md)   
   7장 사과와 오렌지  
   8장 객체 만들기  
   9장 우리가 사는 시간(times)  
