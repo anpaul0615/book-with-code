@@ -1,12 +1,15 @@
 /**
- * Step 14
+ * Step 15
  * 
- * - 테스트 수정 (Franc 클래스 정의)
+ * - 테스트 수정 (Dollar, Franc 의 상위 클래스 Money 정의)
  * - 테스트 통과 확인
  */
 
-class Dollar {
+class Money {}
+
+class Dollar extends Money {
   constructor(amount) {
+    super();
     this.amount = amount;
   }
   multifly(n) {
@@ -14,8 +17,9 @@ class Dollar {
   }
 }
 
-class Franc {
+class Franc extends Money {
   constructor(amount) {
+    super();
     this.amount = amount;
   }
   multifly(n) {
@@ -23,7 +27,7 @@ class Franc {
   }
 }
 
-describe.skip('Dollar & Franc Calculation (Step 14)', ()=>{
+describe.skip('Dollar & Franc Calculation (Step 15)', ()=>{
   test('Dollar Multifly + Equal Test', () => {
     const five_dollars = new Dollar(5);
     expect( five_dollars.multifly(3) ).toEqual(new Dollar(15));
