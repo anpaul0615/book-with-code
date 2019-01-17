@@ -18,7 +18,7 @@
   [5장 솔직히 말하자면](./section05/README.md)  
   [6장 돌아온 '모두를 위한 평등'](./section06/README.md)   
   [7장 사과와 오렌지](./section07/README.md)  
-  8장 객체 만들기  
+  [8장 객체 만들기](./section08/README.md)  
   9장 우리가 사는 시간(times)  
   10장 흥미로운 시간  
   11장 모든 악의 근원  
