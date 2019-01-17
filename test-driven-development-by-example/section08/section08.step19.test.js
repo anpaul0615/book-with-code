@@ -1,8 +1,8 @@
 /**
- * Step 18
+ * Step 19
  * 
- * - 테스트 수정 (equals 함수에서 객체의 클래스타입도 함께 검사함)
- * - 테스트 통과 확인
+ * - 테스트 실행코드 수정 (테스트실행코드에서 하위클래스 Dollar 직접참조 부분 제거)
+ * - 테스트 실패 확인 (상위클래스 Money 에서 하위클래스 Dollar 객체를 생성하는 함수가 정의되지 않음)
  */
 
 class Money {
@@ -13,7 +13,6 @@ class Money {
     return this.__proto__.constructor.name;
   }
   equals(obj) {
-    // ※ 실습예제에서는 각 객체의 클래스타입을 String.equals 함수로 비교하는 방식을 사용했음
     return this.amount == obj.amount
       && this.getClassName() === obj.getClassName();
   }
@@ -33,7 +32,7 @@ class Franc extends Money {
 
 describe.skip('Dollar & Franc Calculation (Step 18)', ()=>{
   test('Dollar Multifly + Equal Test', () => {
-    const five_dollars = new Dollar(5);
+    const five_dollars = Money.dollar(5);  // 상위클래스 Money 를 통해서 하위클래스 Dollar 객체 생성
     expect( five_dollars.multifly(3) ).toEqual(new Dollar(15));
     expect( five_dollars.multifly(5) ).toEqual(new Dollar(25));
   });
@@ -47,6 +46,6 @@ describe.skip('Dollar & Franc Calculation (Step 18)', ()=>{
     expect( (new Dollar(5)).equals(new Dollar(-5)) ).toBeFalsy();
     expect( (new Franc(10)).equals(new Franc(10)) ).toBeTruthy();
     expect( (new Franc(10)).equals(new Franc(-10)) ).toBeFalsy();
-    expect( (new Dollar(5)).equals(new Franc(5)) ).toBeFalsy();  // 총액은 같지만 단위가 다르므로 false
+    expect( (new Dollar(5)).equals(new Franc(5)) ).toBeFalsy();
   });
 });
