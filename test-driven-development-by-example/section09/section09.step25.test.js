@@ -40,7 +40,7 @@ class Franc extends Money {
   }
 }
 
-describe('Dollar & Franc Calculation (Step 25)', ()=>{
+describe.skip('Dollar & Franc Calculation (Step 25)', ()=>{
   test('Dollar Multifly + Equal Test', () => {
     const five_dollars = Money.dollar(5);
     expect( five_dollars.multifly(3) ).toEqual(Money.dollar(15));
