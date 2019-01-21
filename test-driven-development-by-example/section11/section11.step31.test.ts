@@ -1,10 +1,10 @@
 /**
- * Step 29
+ * Step 31
  * 
- * - 테스트 대상코드 수정 (equals 함수 구현을 클래스 비교에서 통화단위 비교로 변경)
+ * - 테스트 대상코드 수정 (하위클래스 참조를 상위클래스로 변경 + 하위클래스 제거)
  * - 테스트 통과 확인
  */
-namespace step29 {
+namespace step31 {
 
   /**
    * Test Targets
@@ -17,49 +17,39 @@ namespace step29 {
       this.amount = amount;
       this.currency = currency;
     }
-    getClassName() {
-      return this.constructor.name;
-    }
     equals(obj: Money) {
       return this.amount == obj.amount
-        && this.getCurrency() === obj.getCurrency();  // 동치연산을 클래스 비교에서 통화단위 비교로 변경
+        && this.getCurrency() === obj.getCurrency();
+    }
+    multifly(n: number) {
+      return new Money(this.amount * n, this.currency);
     }
     getCurrency() {
       return this.currency;
     }
     static dollar(amount: number) {
-      return new Dollar(amount, 'USD');
+      return new Money(amount, 'USD');  // 통화 객체를 하위클래스에서 상위클래스로 변경
     }
     static franc(amount: number) {
-      return new Franc(amount, 'CHF');
+      return new Money(amount, 'CHF');  // 통화 객체를 하위클래스에서 상위클래스로 변경
     }
   }
   
-  class Dollar extends Money {
-    multifly(n: number) {
-      return new Money(this.amount * n, this.currency);
-    }
-  }
-  
-  class Franc extends Money {
-    multifly(n: number) {
-      return new Money(this.amount * n, this.currency);
-    }
-  }
+  // 하위클래스 제거
 
 
   /**
    * Test Suites
    */
-  describe.skip('Dollar & Franc Calculation (Step 29)', ()=>{
+  describe('Dollar & Franc Calculation (Step 31)', ()=>{
     test('Dollar Multifly + Equal Test', () => {
       const five_dollars = Money.dollar(5);
       expect( five_dollars.multifly(3) ).toEqual(Money.dollar(15));
       expect( five_dollars.multifly(5) ).toEqual(Money.dollar(25));
-      expect( five_dollars.multifly(3).equals(Money.dollar(15)) ).toBeTruthy();  // amount and currency is equal!!
+      expect( five_dollars.multifly(3).equals(Money.dollar(15)) ).toBeTruthy();
       expect( five_dollars.multifly(5).equals(Money.dollar(25)) ).toBeTruthy();
-      expect( five_dollars.multifly(100).equals(Money.dollar(999)) ).toBeFalsy();  // currency is equal, but amount is not equal..!
-      expect( five_dollars.multifly(100).equals(Money.franc(100)) ).toBeFalsy();  // amount is equal, but currency is not equal..!
+      expect( five_dollars.multifly(100).equals(Money.dollar(999)) ).toBeFalsy();
+      expect( five_dollars.multifly(100).equals(Money.franc(100)) ).toBeFalsy();
     });
     test('Franc Multifly + Equal Test', () => {
       const ten_francs = Money.franc(10);
