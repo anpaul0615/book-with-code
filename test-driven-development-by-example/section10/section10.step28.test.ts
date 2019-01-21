@@ -1,10 +1,10 @@
 /**
- * Step 26
+ * Step 28
  * 
- * - 코드베이스를 typescript 로 변경
- * - 테스트 통과 확인
+ * - 테스트 대상코드 수정 (multifly 함수에서 상위클래스 객체를 반환하도록 변경)
+ * - 테스트 실패 확인 (equals 함수에서 클래스 불일치 에러 발생)
  */
-namespace step26 {
+namespace step28 {
 
   /**
    * Test Targets
@@ -37,13 +37,13 @@ namespace step26 {
   
   class Dollar extends Money {
     multifly(n: number) {
-      return new Dollar(this.amount * n, 'USD');
+      return new Money(this.amount * n, this.currency);  // 상위클래스 객체 반환하도록 변경 (멤버함수 일원화)
     }
   }
   
   class Franc extends Money {
     multifly(n: number) {
-      return new Franc(this.amount * n, 'CHF');
+      return new Money(this.amount * n, this.currency);  // 상위클래스 객체 반환하도록 변경 (멤버함수 일원화)
     }
   }
 
@@ -51,12 +51,12 @@ namespace step26 {
   /**
    * Test Suites
    */
-  describe.skip('Dollar & Franc Calculation (Step 26)', ()=>{
+  describe.skip('Dollar & Franc Calculation (Step 28)', ()=>{
     test('Dollar Multifly + Equal Test', () => {
       const five_dollars = Money.dollar(5);
       expect( five_dollars.multifly(3) ).toEqual(Money.dollar(15));
       expect( five_dollars.multifly(5) ).toEqual(Money.dollar(25));
-      expect( five_dollars.multifly(3).equals(Money.dollar(15)) ).toBeTruthy();
+      expect( five_dollars.multifly(3).equals(Money.dollar(15)) ).toBeTruthy();  // classname is not equal..!
       expect( five_dollars.multifly(5).equals(Money.dollar(25)) ).toBeTruthy();
     });
     test('Franc Multifly + Equal Test', () => {

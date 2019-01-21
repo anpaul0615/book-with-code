@@ -1,10 +1,10 @@
 /**
- * Step 26
+ * Step 29
  * 
- * - 코드베이스를 typescript 로 변경
+ * - 테스트 대상코드 수정 (equals 함수 구현을 클래스 비교에서 통화단위 비교로 변경)
  * - 테스트 통과 확인
  */
-namespace step26 {
+namespace step29 {
 
   /**
    * Test Targets
@@ -22,7 +22,7 @@ namespace step26 {
     }
     equals(obj: Money) {
       return this.amount == obj.amount
-        && this.getClassName() === obj.getClassName();
+        && this.getCurrency() === obj.getCurrency();  // 동치연산을 클래스 비교에서 통화단위 비교로 변경
     }
     getCurrency() {
       return this.currency;
@@ -37,13 +37,13 @@ namespace step26 {
   
   class Dollar extends Money {
     multifly(n: number) {
-      return new Dollar(this.amount * n, 'USD');
+      return new Money(this.amount * n, this.currency);
     }
   }
   
   class Franc extends Money {
     multifly(n: number) {
-      return new Franc(this.amount * n, 'CHF');
+      return new Money(this.amount * n, this.currency);
     }
   }
 
@@ -51,13 +51,15 @@ namespace step26 {
   /**
    * Test Suites
    */
-  describe.skip('Dollar & Franc Calculation (Step 26)', ()=>{
+  describe('Dollar & Franc Calculation (Step 28)', ()=>{
     test('Dollar Multifly + Equal Test', () => {
       const five_dollars = Money.dollar(5);
       expect( five_dollars.multifly(3) ).toEqual(Money.dollar(15));
       expect( five_dollars.multifly(5) ).toEqual(Money.dollar(25));
-      expect( five_dollars.multifly(3).equals(Money.dollar(15)) ).toBeTruthy();
+      expect( five_dollars.multifly(3).equals(Money.dollar(15)) ).toBeTruthy();  // amount and currency is equal!!
       expect( five_dollars.multifly(5).equals(Money.dollar(25)) ).toBeTruthy();
+      expect( five_dollars.multifly(100).equals(Money.dollar(999)) ).toBeFalsy();  // currency is equal, but amount is not equal..!
+      expect( five_dollars.multifly(100).equals(Money.franc(100)) ).toBeFalsy();  // amount is equal, but currency is not equal..!
     });
     test('Franc Multifly + Equal Test', () => {
       const ten_francs = Money.franc(10);

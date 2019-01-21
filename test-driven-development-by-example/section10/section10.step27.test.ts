@@ -1,10 +1,10 @@
 /**
- * Step 26
+ * Step 27
  * 
- * - 코드베이스를 typescript 로 변경
+ * - 테스트 대상코드 수정 (multifly 함수에서 하드코딩된 통화단위를 멤버변수 참조로 변경)
  * - 테스트 통과 확인
  */
-namespace step26 {
+namespace step27 {
 
   /**
    * Test Targets
@@ -37,13 +37,13 @@ namespace step26 {
   
   class Dollar extends Money {
     multifly(n: number) {
-      return new Dollar(this.amount * n, 'USD');
+      return new Dollar(this.amount * n, this.currency);  // 하드코딩된 통화단위를 멤버변수 참조로 변경
     }
   }
   
   class Franc extends Money {
     multifly(n: number) {
-      return new Franc(this.amount * n, 'CHF');
+      return new Franc(this.amount * n, this.currency);  // 하드코딩된 통화단위를 멤버변수 참조로 변경
     }
   }
 
@@ -51,7 +51,7 @@ namespace step26 {
   /**
    * Test Suites
    */
-  describe.skip('Dollar & Franc Calculation (Step 26)', ()=>{
+  describe.skip('Dollar & Franc Calculation (Step 27)', ()=>{
     test('Dollar Multifly + Equal Test', () => {
       const five_dollars = Money.dollar(5);
       expect( five_dollars.multifly(3) ).toEqual(Money.dollar(15));
