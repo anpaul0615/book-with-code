@@ -1,10 +1,10 @@
 /**
- * Step 31
+ * Step 32
  * 
- * - 테스트 대상코드 수정 (하위클래스 참조를 상위클래스로 변경 + 하위클래스 제거)
- * - 테스트 통과 확인
+ * - 새로운 테스트 추가 ($5 + $5)
+ * - 테스트 실패 확인 (Expression, Bank 클래스 정의되지 않음 + Money.plus 정의되지 않음)
  */
-namespace step31 {
+namespace step32 {
 
   /**
    * Test Targets
@@ -28,20 +28,30 @@ namespace step31 {
       return this.currency;
     }
     static dollar(amount: number) {
-      return new Money(amount, 'USD');  // 통화 객체를 하위클래스에서 상위클래스로 변경
+      return new Money(amount, 'USD');
     }
     static franc(amount: number) {
-      return new Money(amount, 'CHF');  // 통화 객체를 하위클래스에서 상위클래스로 변경
+      return new Money(amount, 'CHF');
     }
   }
-  
-  // 하위클래스 제거
 
 
   /**
    * Test Suites
    */
-  describe.skip('Dollar & Franc Calculation (Step 31)', ()=>{
+  describe.skip('Currency Calculation (Step 32)', ()=>{
+    test('Simple Add Test', ()=>{
+      
+      // ※ typescript 컴파일러 에러로 주석처리
+
+      // const five_dollars: Money = Money.dollar(5);
+      // const sum: Expression = five_dollars.plus(five_dollars);  // $5 + $5 계산식 정의
+      // const bank: Bank = new Bank();
+      // const reduced: Money = bank.reduce(sum, 'USD');  // 계산식 처리 + 환율환산
+      // expect( Money.dollar(10) ).toEqual( reduced );  // 확인
+    });
+  });
+  describe.skip('Dollar & Franc Calculation', ()=>{
     test('Dollar Multifly + Equal Test', () => {
       const five_dollars = Money.dollar(5);
       expect( five_dollars.multifly(3) ).toEqual(Money.dollar(15));

@@ -1,10 +1,10 @@
 /**
- * Step 31
+ * Step 33
  * 
- * - 테스트 대상코드 수정 (하위클래스 참조를 상위클래스로 변경 + 하위클래스 제거)
+ * - 테스트 대상코드 수정 (Expression 인터페이스, Bank 클래스, Bank.reduce\, Money.plus 정의)
  * - 테스트 통과 확인
  */
-namespace step31 {
+namespace step33 {
 
   /**
    * Test Targets
@@ -24,24 +24,42 @@ namespace step31 {
     multifly(n: number) {
       return new Money(this.amount * n, this.currency);
     }
+    plus(target: Money) {  // Money.plus 정의
+      return new Money(this.amount + target.amount, this.currency);
+    }
     getCurrency() {
       return this.currency;
     }
     static dollar(amount: number) {
-      return new Money(amount, 'USD');  // 통화 객체를 하위클래스에서 상위클래스로 변경
+      return new Money(amount, 'USD');
     }
     static franc(amount: number) {
-      return new Money(amount, 'CHF');  // 통화 객체를 하위클래스에서 상위클래스로 변경
+      return new Money(amount, 'CHF');
     }
   }
   
-  // 하위클래스 제거
+  interface Expression {}  // Expression 인터페이스 정의
+
+  class Bank {  // Bank 클래스 정의
+    reduce(exp: Expression, currency: string) {  // Bank.reduce 정의
+      return Money.dollar(10);
+    }
+  }
 
 
   /**
    * Test Suites
    */
-  describe.skip('Dollar & Franc Calculation (Step 31)', ()=>{
+  describe('Currency Calculation (Step 33)', ()=>{
+    test('Simple Add Test', ()=>{
+      const five_dollars: Money = Money.dollar(5);
+      const sum: Expression = five_dollars.plus(five_dollars);  // $5 + $5 계산식 정의
+      const bank: Bank = new Bank();
+      const reduced: Money = bank.reduce(sum, 'USD');  // 계산식 처리 + 환율환산
+      expect( Money.dollar(10) ).toEqual( reduced );  // 확인
+    });
+  });
+  describe.skip('Dollar & Franc Calculation', ()=>{
     test('Dollar Multifly + Equal Test', () => {
       const five_dollars = Money.dollar(5);
       expect( five_dollars.multifly(3) ).toEqual(Money.dollar(15));
