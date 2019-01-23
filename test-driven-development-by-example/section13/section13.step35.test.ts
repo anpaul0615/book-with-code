@@ -1,10 +1,10 @@
 /**
- * Step 33
+ * Step 35
  * 
- * - 테스트 대상코드 수정 (Expression 인터페이스, Bank 클래스, Bank.reduce\, Money.plus 정의)
- * - 테스트 통과 확인
+ * - 새로운 테스트케이스 추가 (Sum 클래스를 통한 더하기 계산)
+ * - 테스트 실패 확인 (더하기 결과값 불일치 문제 발생)
  */
-namespace step33 {
+namespace step35 {
 
   /**
    * Test Targets
@@ -24,8 +24,8 @@ namespace step33 {
     multifly(n: number) {
       return new Money(this.amount * n, this.currency);
     }
-    plus(target: Money) {  // Money.plus 정의
-      return new Money(this.amount + target.amount, this.currency);
+    plus(target: Money) {
+      return new Sum(this, target);
     }
     getCurrency() {
       return this.currency;
@@ -38,10 +38,20 @@ namespace step33 {
     }
   }
   
-  interface Expression {}  // Expression 인터페이스 정의
+  interface Expression {}
+  
+  class Sum implements Expression {
+    augend: Money;
+    addend: Money;
 
-  class Bank {  // Bank 클래스 정의
-    reduce(exp: Expression, currency: string) {  // Bank.reduce 정의
+    constructor(augend: Money, addend: Money) {
+      this.augend = augend;
+      this.addend = addend;
+    }
+  }
+
+  class Bank {
+    reduce(exp: Expression, currency: string) {
       return Money.dollar(10);
     }
   }
@@ -50,13 +60,26 @@ namespace step33 {
   /**
    * Test Suites
    */
-  describe.skip('Currency Calculation (Step 33)', ()=>{
+  describe.skip('Currency Calculation (Step 35)', ()=>{
     test('Simple Add Test', ()=>{
       const five_dollars: Money = Money.dollar(5);
-      const sum: Expression = five_dollars.plus(five_dollars);  // $5 + $5 계산식 정의
+      const sum: Expression = five_dollars.plus(five_dollars);
       const bank: Bank = new Bank();
-      const reduced: Money = bank.reduce(sum, 'USD');  // 계산식 처리 + 환율환산
-      expect( Money.dollar(10) ).toEqual( reduced );  // 확인
+      const reduced: Money = bank.reduce(sum, 'USD');
+      expect( Money.dollar(10) ).toEqual( reduced );
+    });
+    test('Sum Expression Test', ()=>{
+      const five_dollars: Money = Money.dollar(5);
+      const result: Expression = five_dollars.plus(five_dollars);
+      const sum: Sum = <Sum> result;
+      expect( sum.augend ).toEqual( five_dollars );
+      expect( sum.addend ).toEqual( five_dollars );
+    });
+    test('Sum Expression Test 2', ()=>{
+      const sum: Expression = new Sum(Money.dollar(3), Money.dollar(5));  // 더하기를 계산해주는 객체 생성
+      const bank: Bank = new Bank();
+      const result: Money = bank.reduce(sum, 'USD');  // Bank 에서 더하기 계산과 환율계산을 처리
+      expect( Money.dollar(8) ).toEqual( result );  // 결과값 불일치 에러 발생..!
     });
   });
   describe.skip('Dollar & Franc Calculation', ()=>{
