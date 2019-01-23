@@ -23,7 +23,7 @@
   [10장 흥미로운 시간](./section10/README.md)  
   [11장 모든 악의 근원](./section11/README.md)  
   [12장 드디어, 더하기](./section12/README.md)  
-  13장 진짜로 만들기  
+  [13장 진짜로 만들기](./section13/README.md)  
   14장 바꾸기  
   15장 서로 다른 통화끼리 더하기  
   16장 드디어, 추상화  
