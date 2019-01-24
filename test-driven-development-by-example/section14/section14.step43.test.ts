@@ -1,15 +1,15 @@
 /**
- * Step 40
+ * Step 43
  * 
- * - 테스트 대상코드 수정 (Bank.reduce 를 Expression 인터페이스로 끌어올림)
+ * - 테스트 대상코드 수정 (Expression 인터페이스의 reduce 시그니처 변경)
  * - 테스트 통과 확인
  */
-namespace step40 {
+namespace step43 {
 
   /**
    * Test Targets
    */
-  class Money implements Expression {  // Expression 인터페이스 구현체 선언
+  class Money implements Expression {
     amount: number;
     protected currency: string;
   
@@ -27,8 +27,12 @@ namespace step40 {
     plus(target: Money) {
       return new Sum(this, target);
     }
-    reduce(currency: string): Money {  // reduce(:string): Money 함수 구현
-      return this;
+    // reduce(targetCurrency: string): Money {
+    reduce(bank: Bank, targetCurrency: string): Money {  // Expression.reduce 변경 구현
+      const rate = 
+        (this.currency === 'CHF' && targetCurrency === 'USD')
+        ? 2 : 1;
+      return new Money(this.amount / rate, targetCurrency);
     }
     getCurrency() {
       return this.currency;
@@ -42,7 +46,8 @@ namespace step40 {
   }
   
   interface Expression {
-    reduce(currency: string): Money;  // reduce(:string): Money 함수 명세 추가
+    // reduce(currency: string): Money;
+    reduce(bank: Bank, currency: string): Money;  // Bank, currency 를 전달받도록 변경
   }
   
   class Sum implements Expression {
@@ -54,7 +59,8 @@ namespace step40 {
       this.addend = addend;
     }
     
-    reduce(currency: string): Money {
+    // reduce(currency: string): Money {
+    reduce(bank: Bank, currency: string): Money {  // Expression.reduce 변경 구현
       const amount: number = this.augend.amount + this.addend.amount;
       return new Money(amount, currency);
     }
@@ -62,9 +68,11 @@ namespace step40 {
 
   class Bank {
     reduce(exp: Expression, currency: string): Money {
-      // const sum: Sum = <Sum> exp;
-      // return sum.reduce(currency);  // Expression 구현체 검사 부분 제거
-      return exp.reduce(currency);
+      // return exp.reduce(currency);
+      return exp.reduce(this, currency);  // Expression.reduce 에 Bank, currency 를 전달하도록 변경
+    }
+
+    addRate(sourceCurrency: string, targetCurrency: string, rate: number): void {
     }
   }
 
@@ -72,7 +80,7 @@ namespace step40 {
   /**
    * Test Suites
    */
-  describe.skip('Currency Calculation (Step 40)', ()=>{
+  describe.skip('Currency Calculation (Step 43)', ()=>{
     test('Simple Add Test', ()=>{
       const five_dollars: Money = Money.dollar(5);
       const sum: Expression = five_dollars.plus(five_dollars);
@@ -96,6 +104,12 @@ namespace step40 {
     test('Reduce Money Test', ()=>{
       const bank: Bank = new Bank();
       const result: Money = bank.reduce(Money.dollar(1), 'USD');
+      expect( Money.dollar(1) ).toEqual( result );
+    });
+    test('Reduce Different Currency Money Test', ()=>{
+      const bank: Bank = new Bank();
+      bank.addRate('CHF', 'USD', 2);
+      const result: Money = bank.reduce(Money.franc(2), 'USD');
       expect( Money.dollar(1) ).toEqual( result );
     });
   });

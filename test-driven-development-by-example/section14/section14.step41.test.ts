@@ -1,15 +1,15 @@
 /**
- * Step 40
+ * Step 41
  * 
- * - 테스트 대상코드 수정 (Bank.reduce 를 Expression 인터페이스로 끌어올림)
- * - 테스트 통과 확인
+ * - 새로운 테스트케이스 추가 (2CHF 을 1USD 로 바꾸기)
+ * - 테스트 실패 확인
  */
-namespace step40 {
+namespace step41 {
 
   /**
    * Test Targets
    */
-  class Money implements Expression {  // Expression 인터페이스 구현체 선언
+  class Money implements Expression {
     amount: number;
     protected currency: string;
   
@@ -27,7 +27,7 @@ namespace step40 {
     plus(target: Money) {
       return new Sum(this, target);
     }
-    reduce(currency: string): Money {  // reduce(:string): Money 함수 구현
+    reduce(currency: string): Money {
       return this;
     }
     getCurrency() {
@@ -42,7 +42,7 @@ namespace step40 {
   }
   
   interface Expression {
-    reduce(currency: string): Money;  // reduce(:string): Money 함수 명세 추가
+    reduce(currency: string): Money;
   }
   
   class Sum implements Expression {
@@ -62,8 +62,6 @@ namespace step40 {
 
   class Bank {
     reduce(exp: Expression, currency: string): Money {
-      // const sum: Sum = <Sum> exp;
-      // return sum.reduce(currency);  // Expression 구현체 검사 부분 제거
       return exp.reduce(currency);
     }
   }
@@ -72,7 +70,7 @@ namespace step40 {
   /**
    * Test Suites
    */
-  describe.skip('Currency Calculation (Step 40)', ()=>{
+  describe.skip('Currency Calculation (Step 41)', ()=>{
     test('Simple Add Test', ()=>{
       const five_dollars: Money = Money.dollar(5);
       const sum: Expression = five_dollars.plus(five_dollars);
@@ -97,6 +95,12 @@ namespace step40 {
       const bank: Bank = new Bank();
       const result: Money = bank.reduce(Money.dollar(1), 'USD');
       expect( Money.dollar(1) ).toEqual( result );
+    });
+    test('Reduce Different Currency Money Test', ()=>{
+      // const bank: Bank = new Bank();
+      // bank.addRate('CHF', 'USD', 2);  // CHF to USD 환율 추가
+      // const result: Money = bank.reduce(Money.franc(2), 'USD');  // 2CHF 을 USD 로 환전
+      // expect( Money.dollar(1) ).toEqual( result );  // 환전금액이 1USD 가 되어야함 (에러..!)
     });
   });
   describe.skip('Dollar & Franc Calculation', ()=>{
