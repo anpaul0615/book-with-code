@@ -1,10 +1,10 @@
 /**
- * Step 52
+ * Step 54
  * 
- * - 테스트 실행코드 수정 (가산수 피가산수를 Expression 으로 변경)
+ * - 새로운 테스트케이스 추가 + 구현 ({5USD + 10CHF} +5USD = 15USD)
  * - 테스트 통과 확인
  */
-namespace step52 {
+namespace step54 {
 
   /**
    * Test Targets
@@ -60,7 +60,8 @@ namespace step52 {
       return new Money(amount, currency);
     }
     plus(addend: Expression): Expression {
-      return null;
+      // return null;
+      return new Sum(this, addend);  // Sum.plus 구현
     }
   }
 
@@ -102,17 +103,24 @@ namespace step52 {
   /**
    * Test Suites
    */
-  describe.skip('Differnct Currency Calculation (Step 52)', ()=>{
+  describe.skip('Differnct Currency Calculation (Step 54)', ()=>{
     test('5USD + 10CHF = 10USD Test', ()=>{
-      // const five_dollars: Money = Money.dollar(5);
-      const five_dollars: Expression = Money.dollar(5);  // 피가산수를 Expression 으로 변환
-      // const ten_francs: Money = Money.franc(10);
-      const ten_francs: Expression = Money.franc(10);  // 가산수를  Expression 으로 변환
+      const five_dollars: Expression = Money.dollar(5);
+      const ten_francs: Expression = Money.franc(10);
       const bank: Bank = new Bank();
       bank.addRate('CHF', 'USD', 2);
-      const result: Money
-        = bank.reduce( five_dollars.plus(ten_francs), 'USD' );
+      const sum: Expression = new Sum(five_dollars, ten_francs);
+      const result: Money = bank.reduce(sum, 'USD');
       expect( result ).toEqual( Money.dollar(10) );
+    });
+    test('{5USD + 10CHF} +5USD = 15USD Test', ()=>{
+      const five_dollars: Expression = Money.dollar(5);
+      const ten_francs: Expression = Money.franc(10);
+      const bank: Bank = new Bank();
+      bank.addRate('CHF', 'USD', 2);
+      const sum: Expression = new Sum(five_dollars, ten_francs).plus(five_dollars);  // (5USD + 10CHF) +5USD
+      const result: Money = bank.reduce(sum, 'USD');
+      expect( result ).toEqual( Money.dollar(15) );
     });
   });
   describe.skip('Currency Calculation', ()=>{

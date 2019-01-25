@@ -1,10 +1,10 @@
 /**
- * Step 52
+ * Step 55
  * 
- * - 테스트 실행코드 수정 (가산수 피가산수를 Expression 으로 변경)
+ * - 새로운 테스트케이스 추가 + 구현 ({5USD + 10CHF} * 2 = 20USD)
  * - 테스트 통과 확인
  */
-namespace step52 {
+namespace step55 {
 
   /**
    * Test Targets
@@ -20,7 +20,8 @@ namespace step52 {
       return this.amount == obj.amount
         && this.getCurrency() === obj.getCurrency();
     }
-    multifly(n: number) {
+    // multifly(n: number) {
+    multifly(n: number): Expression {  // Money.multifly 가 Expression 을 반환하도록 변경
       return new Money(this.amount * n, this.currency);
     }
     plus(target: Expression): Expression {
@@ -44,6 +45,7 @@ namespace step52 {
   interface Expression {
     reduce(bank: Bank, currency: string): Money;
     plus(addend: Expression): Expression;
+    multifly(n: number): Expression;  // Expression.multifly 시그니처 정의
   }
   
   class Sum implements Expression {
@@ -60,7 +62,10 @@ namespace step52 {
       return new Money(amount, currency);
     }
     plus(addend: Expression): Expression {
-      return null;
+      return new Sum(this, addend);
+    }
+    multifly(n: number): Expression {  // Expression.multifly 구현
+      return new Sum(this.augend.multifly(n), this.addend.multifly(n));
     }
   }
 
@@ -102,18 +107,39 @@ namespace step52 {
   /**
    * Test Suites
    */
-  describe.skip('Differnct Currency Calculation (Step 52)', ()=>{
+  describe('Differnct Currency Calculation (Step 55)', ()=>{
     test('5USD + 10CHF = 10USD Test', ()=>{
-      // const five_dollars: Money = Money.dollar(5);
-      const five_dollars: Expression = Money.dollar(5);  // 피가산수를 Expression 으로 변환
-      // const ten_francs: Money = Money.franc(10);
-      const ten_francs: Expression = Money.franc(10);  // 가산수를  Expression 으로 변환
+      const five_dollars: Expression = Money.dollar(5);
+      const ten_francs: Expression = Money.franc(10);
       const bank: Bank = new Bank();
       bank.addRate('CHF', 'USD', 2);
-      const result: Money
-        = bank.reduce( five_dollars.plus(ten_francs), 'USD' );
+      const sum: Expression = new Sum(five_dollars, ten_francs);
+      const result: Money = bank.reduce(sum, 'USD');
       expect( result ).toEqual( Money.dollar(10) );
     });
+    test('{5USD + 10CHF} + 5USD = 15USD Test', ()=>{
+      const five_dollars: Expression = Money.dollar(5);
+      const ten_francs: Expression = Money.franc(10);
+      const bank: Bank = new Bank();
+      bank.addRate('CHF', 'USD', 2);
+      const sum: Expression = new Sum(five_dollars, ten_francs).plus(five_dollars);
+      const result: Money = bank.reduce(sum, 'USD');
+      expect( result ).toEqual( Money.dollar(15) );
+    });
+    test('{5USD + 10CHF} * 2 = 20USD Test', ()=>{
+      const five_dollars: Expression = Money.dollar(5);
+      const ten_francs: Expression = Money.franc(10);
+      const bank: Bank = new Bank();
+      bank.addRate('CHF', 'USD', 2);
+      const sum: Expression = new Sum(five_dollars, ten_francs).multifly(2);  // (5USD + 10CHF) * 2
+      const result: Money = bank.reduce(sum, 'USD');
+      expect( result ).toEqual( Money.dollar(20) );
+    });
+    // test('Money,Expression Instance Type Test', ()=>{
+    //   const sum: Expression = Money.dollar(1).plus(Money.dollar(1));
+    //   // expect( sum instanceof Money ).toBeTruthy();  //error..!
+    //   expect( sum instanceof Sum ).toBeTruthy();
+    // });
   });
   describe.skip('Currency Calculation', ()=>{
     test('Simple Add Test', ()=>{
@@ -156,17 +182,17 @@ namespace step52 {
       const five_dollars = Money.dollar(5);
       expect( five_dollars.multifly(3) ).toEqual(Money.dollar(15));
       expect( five_dollars.multifly(5) ).toEqual(Money.dollar(25));
-      expect( five_dollars.multifly(3).equals(Money.dollar(15)) ).toBeTruthy();
-      expect( five_dollars.multifly(5).equals(Money.dollar(25)) ).toBeTruthy();
-      expect( five_dollars.multifly(100).equals(Money.dollar(999)) ).toBeFalsy();
-      expect( five_dollars.multifly(100).equals(Money.franc(100)) ).toBeFalsy();
+      expect( (<Money>five_dollars.multifly(3)).equals(Money.dollar(15)) ).toBeTruthy();   // Money.multifly 에서 Expression 을 반환하여
+      expect( (<Money>five_dollars.multifly(5)).equals(Money.dollar(25)) ).toBeTruthy();   // Money.equals 가 동작하지 않는 문제 발생
+      expect( (<Money>five_dollars.multifly(100)).equals(Money.dollar(999)) ).toBeFalsy(); // → 일단 임시로 Money 로 캐스팅하는것으로 테스트 회피
+      expect( (<Money>five_dollars.multifly(100)).equals(Money.franc(100)) ).toBeFalsy();  // → 추후 Expression.equals 구현 고려해야함!
     });
     test('Franc Multifly + Equal Test', () => {
       const ten_francs = Money.franc(10);
       expect( ten_francs.multifly(2) ).toEqual(Money.franc(20));
       expect( ten_francs.multifly(8) ).toEqual(Money.franc(80));
-      expect( ten_francs.multifly(2).equals(Money.franc(20)) ).toBeTruthy();
-      expect( ten_francs.multifly(8).equals(Money.franc(80)) ).toBeTruthy();
+      expect( (<Money>ten_francs.multifly(2)).equals(Money.franc(20)) ).toBeTruthy();  // 상동
+      expect( (<Money>ten_francs.multifly(8)).equals(Money.franc(80)) ).toBeTruthy();
     });
     test('Dollar, Franc Equal Test', () => {
       expect( (Money.dollar(5)).equals(Money.dollar(5)) ).toBeTruthy();
