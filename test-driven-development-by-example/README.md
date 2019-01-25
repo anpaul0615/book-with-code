@@ -26,7 +26,7 @@
   [13장 진짜로 만들기](./section13/README.md)  
   [14장 바꾸기](./section14/README.md)  
   [15장 서로 다른 통화끼리 더하기](./section15/README.md)  
-  16장 드디어, 추상화  
+  [16장 드디어, 추상화](./section16/README.md)  
   17장 Money 회고  
   
 - **2부 XUnit 예시**  
