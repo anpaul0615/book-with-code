@@ -1,10 +1,10 @@
 /**
- * Step 46
+ * Step 47
  * 
- * - 테스트 대상코드 수정 (Bank.getRate 에 같은 통화단위에 대한 환율처리 추가)
- * - 테스트 통과 확인
+ * - 새로운 테스트케이스 추가 (5USD + 10CHF = 10USD, 환율이 2:1인 경우)
+ * - 테스트 실패 확인 (컴파일 에러 발생, Expression.plus 정의되지 않음)
  */
-namespace step46 {
+namespace step47 {
 
   /**
    * Test Targets
@@ -12,7 +12,6 @@ namespace step46 {
   class Money implements Expression {
     amount: number;
     protected currency: string;
-  
     constructor(amount: number, currency: string) {
       this.amount = amount;
       this.currency = currency;
@@ -49,12 +48,10 @@ namespace step46 {
   class Sum implements Expression {
     augend: Money;
     addend: Money;
-
     constructor(augend: Money, addend: Money) {
       this.augend = augend;
       this.addend = addend;
     }
-    
     reduce(bank: Bank, currency: string): Money {
       const amount: number = this.augend.amount + this.addend.amount;
       return new Money(amount, currency);
@@ -63,21 +60,17 @@ namespace step46 {
 
   class Bank {
     private rates: Map<any,number>;
-
     constructor () {
       this.rates = new Map();
     }
-
     reduce(exp: Expression, currency: string): Money {
       return exp.reduce(this, currency);
     }
-
     addRate(sourceCurrency: string, targetCurrency: string, rate: number): void {
       this.rates.set( new Pair(sourceCurrency,targetCurrency).hashCode() , rate);
     }
-
     getRate(sourceCurrency: string, targetCurrency: string): number {
-      if (sourceCurrency === targetCurrency) return 1;  // 같은 통화단위에 대한 환율 반환처리 추가
+      if (sourceCurrency === targetCurrency) return 1;
       const rate: number = this.rates.get( new Pair(sourceCurrency,targetCurrency).hashCode() );
       return rate;
     }
@@ -86,17 +79,14 @@ namespace step46 {
   class Pair {
     private sourceCurrency: string;
     private targetCurrency: string;
-    
     constructor(sourceCurrency:string, targetCurrency:string) {
       this.sourceCurrency = sourceCurrency;
       this.targetCurrency = targetCurrency;
     }
-
     equals(target: Pair): boolean {
       return this.sourceCurrency === target.sourceCurrency
         && this.targetCurrency === target.targetCurrency;
     }
-
     hashCode() {
       return 0;
     }
@@ -106,7 +96,18 @@ namespace step46 {
   /**
    * Test Suites
    */
-  describe.skip('Currency Calculation (Step 46)', ()=>{
+  describe.skip('Differnct Currency Calculation (Step 47)', ()=>{
+    test('5USD + 10CHF = 10USD Test', ()=>{
+      // const five_dollars: Expression = Money.dollar(5);
+      // const ten_francs: Expression = Money.franc(10);
+      // const bank: Bank = new Bank();
+      // bank.addRate('CHF', 'USD', 2);
+      // const result: Money
+      //   = bank.reduce( five_dollars.plus(ten_francs), 'USD' );  // 컴파일에러..! (Expression.plus 정의되지 않음)
+      // expect( result ).toEqual( Money.dollar(10) );
+    });
+  });
+  describe.skip('Currency Calculation', ()=>{
     test('Simple Add Test', ()=>{
       const five_dollars: Money = Money.dollar(5);
       const sum: Expression = five_dollars.plus(five_dollars);
@@ -129,10 +130,10 @@ namespace step46 {
     });
     test('Reduce Money Test', ()=>{
       const bank: Bank = new Bank();
-      const result: Money = bank.reduce(Money.dollar(1), 'USD');  // 같은 통화단위 계산 성공
+      const result: Money = bank.reduce(Money.dollar(1), 'USD');
       expect( Money.dollar(1) ).toEqual( result );
     });
-    test('Reduce Same Currency Money Test', ()=>{  // 같은 통화단위 계산 테스트케이스 추가
+    test('Reduce Same Currency Money Test', ()=>{
       expect( new Bank().getRate('USD','USD') ).toEqual(1);
     })
     test('Reduce Different Currency Money Test', ()=>{
