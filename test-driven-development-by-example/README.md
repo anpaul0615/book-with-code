@@ -27,7 +27,7 @@
   [14장 바꾸기](./section14/README.md)  
   [15장 서로 다른 통화끼리 더하기](./section15/README.md)  
   [16장 드디어, 추상화](./section16/README.md)  
-  17장 Money 회고  
+  [17장 Money 회고](./section17/README.md)  
   
 - **2부 XUnit 예시**  
   18장 xUnit으로 가는 첫걸음  
