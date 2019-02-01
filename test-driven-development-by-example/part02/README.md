@@ -8,6 +8,6 @@
 - [20장 뒷정리하기](./section20/README.md)
 - [21장 셈하기](./section21/README.md)
 - [22장 실패 처리하기](./section22/README.md)
-- 23장 얼마나 달콤한지
+- [23장 얼마나 달콤한지](./section23/README.md)
 - 24장 xUnit 회고
 
