@@ -9,5 +9,5 @@
 - [21장 셈하기](./section21/README.md)
 - [22장 실패 처리하기](./section22/README.md)
 - [23장 얼마나 달콤한지](./section23/README.md)
-- 24장 xUnit 회고
+- [24장 xUnit 회고](./section24/README.md)
 
