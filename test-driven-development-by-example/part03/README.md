@@ -7,7 +7,7 @@
 - [26장 빨간 막대 패턴](./section26/README.md)
 - [27장 테스팅 패턴](./section27/README.md)
 - [28장 초록 막대 패턴](./section28/README.md)
--  29장 xUnit 패턴
+- [29장 xUnit 패턴](./section29/README.md)
 -  30장 디자인 패턴
 -  31장 리팩토링
 -  32장 TDD 마스터하기
