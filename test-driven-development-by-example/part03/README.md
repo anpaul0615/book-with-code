@@ -9,6 +9,6 @@
 - [28장 초록 막대 패턴](./section28/README.md)
 - [29장 xUnit 패턴](./section29/README.md)
 - [30장 디자인 패턴](./section30/README.md)
--  31장 리팩토링
+- [31장 리팩토링](./section31/README.md)
 -  32장 TDD 마스터하기
 
