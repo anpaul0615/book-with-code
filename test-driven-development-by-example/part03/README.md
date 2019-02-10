@@ -10,5 +10,5 @@
 - [29장 xUnit 패턴](./section29/README.md)
 - [30장 디자인 패턴](./section30/README.md)
 - [31장 리팩토링](./section31/README.md)
--  32장 TDD 마스터하기
+- [32장 TDD 마스터하기](./section32/README.md)
 
