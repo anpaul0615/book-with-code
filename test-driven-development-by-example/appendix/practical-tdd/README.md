@@ -179,7 +179,272 @@
 
 ## 네트워크 프로그래밍에서의 TDD
 
-(todo)
+> XP 에서 주문처럼 불리는 "Do The Simplest Thing That Cloud Possibly Work"(제대로 돌아가는 가장 간단한 것을 하라) 를 생각해볼 때, 만들어야 하는 프로그램도 여러가지 간단한 작업 묶음으로 나눌 수 있다.
+
+
+### 제대로 돌아가는 가장 간단한 것은 무엇일까?
+
+> (대문자 변환 서버 테스트코드 : 대문자 변환 기능 확인)
+> ```java
+> class UpperServerTest extends TestCase {
+> 	public void testUpper() {
+> 		UpperServer us = new UpperServer();
+> 		assertEquals("TESTING", us.toUpper("testing"));  // 대문자 변환 기능부터 테스트
+> 	}
+> }
+> ```
+
+> (대문자 변환 서버 모델코드 : 대문자 변환 기능 가짜 구현)
+> ```java
+> class UpperServer {
+> 	public String toUpper(String str) {
+> 		return "TESTING";  // 상수 대문자 반환
+> 	}
+> }
+> ```
+
+> (대문자 변환 서버 모델코드 : 대문자 변환 기능 리팩토링)
+> ```java
+> class UpperServer {
+> 	public String toUpper(String str) {
+> 		return str.toUpperCase();  // 변환된 대문자 반환
+> 	}
+> }
+> ```
+
+> 서버 프로그래밍을 하고 있지만, 처음 작성한 코드에 우선적으로 서버를 리슨하거나 사용자 접속 처리 등의 기능을 작성하지 않고, 실제 그 서버가 하는 일, 즉 로직 부분을 먼저 작성했다.
+
+> 보통 개발할 때 네트워크 프레임워크부터 작성한 후 로직을 작성하는데, TDD 로 접근할 때는 로직에 해당하는 부분에 먼저 접근하는 것이 좋다. 네트워크나 GUI 부분을 먼저 작성하면 다른 라이브러리에 대해 의존성이 발생하고, 테스트-구현-리팩토링의 리듬이 길어지기 때문이다. DTSTTCPW 를 상기해보자.
+
+
+### 모의 객체 이용
+
+> 테스트를 진행할 때, 꼭 클라이언트 소켓이 서버에 접속할 필요는 없다. 일종의 가짜 접속을 만드는 방법을 생각해보자.
+
+> (커넥션 모의객체를 통한 문자열 수신 기능 테스트)
+> ```java
+> class UpperServerTest extends TestCase {
+> 	//...
+> 	public void testReceive() {
+> 		MockConnection conn = new MockConnection();
+> 		String str = "testing";
+> 		conn.setReceivedString(str);  // 수동으로 문자열 수신 버퍼 등록 (서버커넥션)
+> 		UpperServer us = new UpperServer();
+> 		us.receive(conn);  // 수동으로 문자열 수신 실행 (서버)
+> 		assertEquals("str", us.getReceivedString());  // 수동으로 문자열 수신 확인
+> 	}
+> }
+> ```
+
+> (커넥션 모의객체)
+> ```java
+> class MockConnection extends UserConnection {
+> 	private String receivedString;
+> 	
+> 	public String receive() {  // 모의 수신 확인
+>			return this.recevedString;
+> 	}
+> 	public void setReceivedString(String str) {  // 모의 수신 등록 (수신 예정 문자열 저장)
+>			return this.recevedString = str;
+> 	}
+> }
+> ```
+
+> (모의객체와 실제 구현할 객체에서 사용할 커넥션 인터페이스)
+> ```java
+> class UserConnection {
+> 	public String receive() {
+>			return null;
+> 	}
+> }
+> ```
+
+> (대문자 변환 서버에 커넥션 인터페이스 객체 적용)
+> ```java
+> class UpperServer {
+> 	private String receivedString;
+> 	
+> 	public String toUpper(String str) {  // 대문자 변환
+> 		return str.toUpperCase();
+> 	}
+> 	public void recevie(UserConnection conn) {  // 커넥션 인터페이스에서 문자열 수신
+> 		this.receivedString = conn.receive();
+> 	}
+> 	public String getReceivedString() {  // 수신한 문자열 확인
+> 		return receivedString;
+> 	}
+> }
+> ```
+
+> 이렇게 모의 객체를 만든 후 TDD 를 진행하면, 매번 서버에 접속해서 제대로 작동하는지 확인하는 것보다 더 빠르게 작업할 수 있고, 디자인도 원하는 대로 자유롭게 할 수 있다.
+
+> 하지만 단점이 있다. 모의 객체를 사용할때는 테스트가 잘 돌아가는데, 실제 객체를 사용하면 제대로 되지 않을 수도 있다. 그러므로 TDD 를 처음에 진행할 때는 모의 객체를 사용하되, 이느 정도 코드 구현이 진행되면 실제 객체를 사용한 테스트도 함께 실행해야 한다.
+
+> (실제 소켓을 이용한 클리이언트 접속 테스트)
+> ```java
+> class UpperServerTest extends TestCase {
+> 	//...
+> 	public void testConnect() {
+> 		UpperServer us = new UpperServer();
+> 		int port = 5000;
+> 		us.serve(port);  // 서버 연결대기 시작
+> 		Socket sock = new Socket("localhost", port);  // 클라이언트 연결 시작
+> 		Thread.sleep(100);
+> 		assertEquals(1, us.getConnectionCount());  // 서버 커넥션 개수 확인
+> 	}
+> }
+> 
+> class UpperServer {
+> 	//...
+> 	private int connectionCount;
+> 	private SocketListen socketListen;
+> 	
+> 	public void serve(int port) {
+> 		connectionCount = 0;
+> 		socketListen = new SocketListen(port);  // 커넥션 연결요청 수신대기 시작
+> 		listenConnection();
+> 	}
+> 	private void listenConnection() {
+> 		new Thread( new Runnable() {
+> 			public void run() {
+> 				try {
+> 					Socket user = socketListen.accept();  // 클라이언트 커넥션 연결요청 받자마자
+> 					connectionCount++;  // 커넥션 카운팅 하고
+> 					user.close();  // 커넥션 종료
+> 				} catch (IOException e) {
+> 					e.printStackTrace();
+> 				}
+> 			}
+> 		}).start();
+> 	}
+> 	public int getConnectionCount() {  // 현재 커넥션 카운터 확인
+> 		return this.connectionCount;
+> 	}
+> 	public void close() {  // 커넥션 연결요청 수신대기 종료
+> 		socketListen.close();
+> 	}
+> }
+> ```
+
+> (대문자 반환 서버가 처리 결과를 클라이언트로 보내는 과정 확인)
+> ```java
+> class UpperServerTest extends TestCase {
+> 	//...
+> 	public void testUpperRespond() {
+> 		MockConnection conn = new MockCOnnection();
+> 		String str = "testing";
+> 		conn.setReceivedString(str);
+> 		UpperServer us = new UpperServer();
+> 		us.upperRespond(conn);
+> 		assertEquals("TESTING", conn.getSentString());
+> 	}
+> }
+> 
+> class MockConnection extends UserConnection {
+> 	//...
+> 	private String receivedString;
+> 	private String sentString;
+> 	
+> 	public String receive() {
+>			return this.receivedString;
+> 	}
+> 	public void setReceivedString(String str) {
+>			return this.receivedString = str;
+> 	}
+> 	public void send(String str) {  // 모의 송신 (송신 예정 문자열 저장)
+>			this.sentString = str;
+> 	}
+> 	public String getSentString() {  // 모의 송신 확인
+>			return this.sentString;
+> 	}
+> }
+> 
+> class UpperServer {
+> 	//...
+> 	public void upperRespond(UserConnection conn) {
+> 		String str = conn.receive();  // 모의커넥션객체에서 문자열 수신
+> 		String upperdStr = toUpper(str);  // 수신문자열 대문자 변환
+> 		conn.send(upperdStr);  // 모의커넥션객체로 변환 문자열 송신
+> 	}
+> }
+> ```
+
+> (실제 소켓객체 기반 서버 동작 확인)
+> ```java
+> class UpperServerTest extends TestCase {
+> 	//...
+> 	public void testServe() {
+> 		int port 5000;
+> 		UpperServer us = new UpperServer();
+> 		us.serve(port);  // 실제 소켓객체로 서버 연결대기 시작
+> 		
+> 		Socket sock = new Socket("localhost", port);  // 실제 소켓객체로 서버 연결
+> 		BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));  // 실제 소켓객체와 입력스트림 연결
+> 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));  // 실제 소켓객체와 출력스트림 연결
+> 		bw.write("iwanttoupper");  // 입력스트림으로 실제 소켓객체로 메시지 송신
+> 		bw.newLine();
+> 		bw.flush();
+> 		
+> 		String actual = br.readLine();  // 출력스트림으로 실제 소켓객체에서 수신한 메시지 확인
+> 		String expected = "IWANTTOUPPER";  // 응답문자열 기대값
+> 		Thread.sleep(100);
+> 		us.close();  // 실제 소켓객체 서버 연결대기 종료
+> 		
+> 		assertEquals(actual, expected);  // 응답문자열 비교 확인
+> 	}
+> }
+> 
+> class UserConnection {
+> 	//...
+> 	private Socket socket;
+> 	private BufferedReader reader;
+> 	private BufferedWriter writer;
+> 	
+> 	public String receive() {  // 입력스트림객체로 실제 수신
+> 		String received = reader.readLine();
+> 		return received;
+> 	}
+> 	public void send(String str) {  // 출력스트림객체로 실제 송신 
+> 		writer.write(str);
+> 		writer.newLine();
+> 		writer.flush();
+> 	}
+> 	public void setSocket(Socket sock) {  // 실제 소켓객체 등록
+> 		this.socket = socket;
+> 		reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+> 		writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
+> 	}
+> 	public void close() {  // 실제 소켓객체 연결해제
+>			this.socket.close();
+> 	}
+> }
+> 
+> class UpperServer {
+> 	//...
+> 	public void serve(int port) {
+> 		connectionCount = 0;
+> 		socketListen = new SocketListen(port);
+> 		listenConnection();
+> 	}
+> 	private void listenConnection() {
+> 		new Thread( new Runnable() {
+> 			public void run() {
+> 				try {
+> 					UserConnection userConn = new UserConnection();
+> 					Socket userSock = socketListen.accept();  // 클라이언트 소켓연결 받자마자
+> 					connectionCount++;  // 커넥션 카운팅 하고
+> 					userConn.setSocket(userSock);  // 클라이언트소켓을 클라이언트커넥션에 등록하고
+> 					upperRespond(userConn);  // 클라이언트커넥션으로 서버응답처리 실행하고
+> 					userConn.close();  // 클라이언트커넥션 종료
+> 				} catch (IOException e) {
+> 					e.printStackTrace();
+> 				}
+> 			}
+> 		}).start();
+> 	}
+> }
+> ```
+
 
 
 
