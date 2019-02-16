@@ -446,6 +446,77 @@
 > ```
 
 
+### 정보 은닉 : 셀프 션트(Self-Shunt) 패턴의 이용
+
+> (사이트 게시판 크롤링 프로그램에 대한 요구사항)  
+> - 해당 사이트에 접속할 수 있다. 이때 http 로 해당 웹서버에 접속해서 데이터를 GET 또는 POST 로 보낸 후 그 결과물을 받는다.  
+> - 결과물에는 HTML 문서 파일이 있거나 이미지 파일이 있을 수 있다.  
+> - 로그인을 할 수 있어야 한다. 이에 대해서는 일종의 쿠키 관련 처리가 필요하다.  
+> - 얻어온 HTML 파일에 대해 실제 이용하려는 데이터로 문서를 분석해야 한다.  
+> - 분석해 만들어진 데이터를 파일에 저장한다.  
+
+> 일단은 http 로 웹 서버에 접속하는 부분부터 만들어야 할 것 같지만 실제로는 어떠한 부분이 먼저 작성되건 싱관없다. 중간 중간 의존성을 가지는 부분에 대해 임의의 데이터를 이용하면 된다. 각각의 일은 독립적으로 구현할 수 있다.  
+> - 분석해야 할 HTML 파일을 일단 웹브라우저를 이용해서 파일로 저장한 다음 이를 분석하는 모듈을 TDD 로 작성할 수 있다.  
+> - 데이터가 이미 분석됐다고 가정하고 이를 파일에 저장하도록 할 수 있다.  
+> - http 접근을 통해 문서나 이미지를 얻어온 후 제대로 얻어왔는지에 대해 TDD 로 접근할 수 있다.  
+> - 전체를 통합할 떄 제대로 돌아가는지에 대해서 TDD 로 작성하며 통합할 수 있다.  
+
+> (사이트 게시판 크롤링 프로그램에 대한 TDD 결과물)  
+> ```python
+> class HtmlFileTest(unittest.TestCase) :
+> 	def getTextFromFile(self, filename) :
+> 		return getTextFromFile("testdatas/" + filename)
+> 
+> 
+> class AlbumPageExtractLocalTest(HtmlFileTest) :
+> 	def setUp(self) :
+> 		page = self.getTextFromFile("album-page-2.html")  ## 미리 준비한 파일로부터 HTML 문서데이터 가져오기
+> 		self.albumpage = AlbumPageExtractor(page).AlbumPage()
+> 	
+> 	def testExtractTotalPage(self) :
+> 		self.assertEquals(1, self.albumpage.getTotalPage())
+> 	
+> 	def testExtractCellNum(self) :
+> 		expected = ['9','8','7','6','5','4','3','2','1']
+> 		self.assertEquals(expected, self.albumpage.cellNums())
+> 	
+> 	# ...
+> ```
+
+> 여기에서 기본적인 간단한 아이디어는 각 단계 사이사이에 대해서 "이 부분을 작성하기 위해 필요한 부분을 누군가가 잘 만들어 놓았다" 라고 가정하는 것이다. 그리고 그 부분에 대해서는 모의 객체를 이용하면 된다. 모의 객체는 테스트를 작성할 때 어려운 상황에 대해 다양한 아이디어를 제공한다.
+
+> ```python
+> class AlbumPageExtractLocalTest(HtmlFileTest) :
+> 	# ...
+> 	def testExtract(self) :
+> 		
+> 		class MockPage:  ## 앨범페이지 HTML 을 반환하는 모의객체
+> 			def toString(self) :
+> 				return getTextFromFile("testdatas/album-page-2.html")
+> 		
+> 		page = MockPage()  ## 모의객체에서 가져온 HTML
+> 		albumpage = AlbumPageExtractor(page).AlbumPage()  ## HTML 에서 데이터 추출
+> 		self.assertEquals(1, albumpage.getTotalPage())
+> ```
+
+> 모의 객체를 작성하면서 자연스럽게 Page 라는 클래스가 디자인된다. 이것의 장점은, 추후 Page 내의 HTML 문서 데이터가 필요할 때, 이를 어디서 어떻게 얻어오는지에 대해서 클래스 사용자가 신경쓰지 않아도 된다는 것이다. 즉 일종의 정보 은닉이 된다.
+
+> 어느 시점에서 어떤 URL 로부터 문서 데이터를 긁어오는지는 중요하지 않고, 필요할 때 데이터가 들어오기만 하면 된다. 즉 AlbumPageExtractor 는 필요할 때 Page 클래스에서 HTML 문서 데이터를 제대로 보내준다는 것만 알면 되고, 그 외의 데이터가 어디에서 어떠한 방법으로 오는지에 대해서는 신경 쓸 필요가 없게 된다.
+
+> 다음과 같이 구현할 수도 있다. Mock 위치에 아예 테스트 자신의 레퍼런스를 넣는 것이다. 이를 이용해 TDD 를 할 때 다른 모듈에 구애 받지 않고 독립적으로 테스트를 진행할 수 있다.  
+> ```python
+> class AlbumPageExtractLocalTest(HtmlFileTest) :
+> 	# ...
+> 	def testExtract(self) :
+> 		albumpage = AlbumPageExtractor(page).AlbumPage()  ## 자기자신의 toString 을 호출해서 HTML 가져오기
+> 		self.assertEquals(1, albumpage.getTotalPage())
+> 	
+> 	def toString(self) :
+> 		return getTextFromFile("testdatas/album-page-2.html")
+> ```
+
+> 이를 Self-Shunt 패턴이라고 한다. TDD 하는 중 입력-결과 테스트(블랙박스 테스트) 가 어려울 때 모의 객체나 Self-Shunt 패턴을 이용하면 객체 내부의 상태 변화 과정에 대한 테스트(화이트박스 테스트) 가 가능해진다.
+
 
 
 ## 데이터베이스 프로그래밍에서의 TDD
