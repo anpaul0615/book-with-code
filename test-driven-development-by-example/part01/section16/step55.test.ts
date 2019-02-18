@@ -1,0 +1,209 @@
+/**
+ * Step 55
+ * 
+ * - 새로운 테스트케이스 추가 + 구현 ({5USD + 10CHF} * 2 = 20USD)
+ * - 테스트 통과 확인
+ */
+namespace step55 {
+
+  /**
+   * Test Targets
+   */
+  class Money implements Expression {
+    amount: number;
+    protected currency: string;
+    constructor(amount: number, currency: string) {
+      this.amount = amount;
+      this.currency = currency;
+    }
+    equals(obj: Money) {
+      return this.amount == obj.amount
+        && this.getCurrency() === obj.getCurrency();
+    }
+    // multifly(n: number) {
+    multifly(n: number): Expression {  // Money.multifly 가 Expression 을 반환하도록 변경
+      return new Money(this.amount * n, this.currency);
+    }
+    plus(target: Expression): Expression {
+      return new Sum(this, target);
+    }
+    reduce(bank: Bank, targetCurrency: string): Money {
+      const rate = bank.getRate(this.currency, targetCurrency);
+      return new Money(this.amount / rate, targetCurrency);
+    }
+    getCurrency() {
+      return this.currency;
+    }
+    static dollar(amount: number) {
+      return new Money(amount, 'USD');
+    }
+    static franc(amount: number) {
+      return new Money(amount, 'CHF');
+    }
+  }
+  
+  interface Expression {
+    reduce(bank: Bank, currency: string): Money;
+    plus(addend: Expression): Expression;
+    multifly(n: number): Expression;  // Expression.multifly 시그니처 정의
+  }
+  
+  class Sum implements Expression {
+    augend: Expression;
+    addend: Expression;
+    constructor(augend: Expression, addend: Expression) {
+      this.augend = augend;
+      this.addend = addend;
+    }
+    reduce(bank: Bank, currency: string): Money {
+      const amount: number
+        = this.augend.reduce(bank, currency).amount
+         + this.addend.reduce(bank, currency).amount;
+      return new Money(amount, currency);
+    }
+    plus(addend: Expression): Expression {
+      return new Sum(this, addend);
+    }
+    multifly(n: number): Expression {  // Expression.multifly 구현
+      return new Sum(this.augend.multifly(n), this.addend.multifly(n));
+    }
+  }
+
+  class Bank {
+    private rates: Map<any,number>;
+    constructor () {
+      this.rates = new Map();
+    }
+    reduce(exp: Expression, currency: string): Money {
+      return exp.reduce(this, currency);
+    }
+    addRate(sourceCurrency: string, targetCurrency: string, rate: number): void {
+      this.rates.set( new Pair(sourceCurrency,targetCurrency).hashCode() , rate);
+    }
+    getRate(sourceCurrency: string, targetCurrency: string): number {
+      if (sourceCurrency === targetCurrency) return 1;
+      const rate: number = this.rates.get( new Pair(sourceCurrency,targetCurrency).hashCode() );
+      return rate;
+    }
+  }
+
+  class Pair {
+    private sourceCurrency: string;
+    private targetCurrency: string;
+    constructor(sourceCurrency:string, targetCurrency:string) {
+      this.sourceCurrency = sourceCurrency;
+      this.targetCurrency = targetCurrency;
+    }
+    equals(target: Pair): boolean {
+      return this.sourceCurrency === target.sourceCurrency
+        && this.targetCurrency === target.targetCurrency;
+    }
+    hashCode() {
+      return 0;
+    }
+  }
+
+
+  /**
+   * Test Suites
+   */
+  describe('Differnct Currency Calculation (Step 55)', ()=>{
+    test('5USD + 10CHF = 10USD Test', ()=>{
+      const five_dollars: Expression = Money.dollar(5);
+      const ten_francs: Expression = Money.franc(10);
+      const bank: Bank = new Bank();
+      bank.addRate('CHF', 'USD', 2);
+      const sum: Expression = new Sum(five_dollars, ten_francs);
+      const result: Money = bank.reduce(sum, 'USD');
+      expect( result ).toEqual( Money.dollar(10) );
+    });
+    test('{5USD + 10CHF} + 5USD = 15USD Test', ()=>{
+      const five_dollars: Expression = Money.dollar(5);
+      const ten_francs: Expression = Money.franc(10);
+      const bank: Bank = new Bank();
+      bank.addRate('CHF', 'USD', 2);
+      const sum: Expression = new Sum(five_dollars, ten_francs).plus(five_dollars);
+      const result: Money = bank.reduce(sum, 'USD');
+      expect( result ).toEqual( Money.dollar(15) );
+    });
+    test('{5USD + 10CHF} * 2 = 20USD Test', ()=>{
+      const five_dollars: Expression = Money.dollar(5);
+      const ten_francs: Expression = Money.franc(10);
+      const bank: Bank = new Bank();
+      bank.addRate('CHF', 'USD', 2);
+      const sum: Expression = new Sum(five_dollars, ten_francs).multifly(2);  // (5USD + 10CHF) * 2
+      const result: Money = bank.reduce(sum, 'USD');
+      expect( result ).toEqual( Money.dollar(20) );
+    });
+    // test('Money,Expression Instance Type Test', ()=>{
+    //   const sum: Expression = Money.dollar(1).plus(Money.dollar(1));
+    //   // expect( sum instanceof Money ).toBeTruthy();  //error..!
+    //   expect( sum instanceof Sum ).toBeTruthy();
+    // });
+  });
+  describe.skip('Currency Calculation', ()=>{
+    test('Simple Add Test', ()=>{
+      const five_dollars: Money = Money.dollar(5);
+      const sum: Expression = five_dollars.plus(five_dollars);
+      const bank: Bank = new Bank();
+      const reduced: Money = bank.reduce(sum, 'USD');
+      expect( Money.dollar(10) ).toEqual( reduced );
+    });
+    test('Sum Expression Test', ()=>{
+      const five_dollars: Money = Money.dollar(5);
+      const result: Expression = five_dollars.plus(five_dollars);
+      const sum: Sum = <Sum> result;
+      expect( sum.augend ).toEqual( five_dollars );
+      expect( sum.addend ).toEqual( five_dollars );
+    });
+    test('Sum Expression Test 2', ()=>{
+      const sum: Expression = new Sum(Money.dollar(3), Money.dollar(5));
+      const bank: Bank = new Bank();
+      const result: Money = bank.reduce(sum, 'USD');
+      expect( Money.dollar(8) ).toEqual( result );
+    });
+    test('Reduce Money Test', ()=>{
+      const bank: Bank = new Bank();
+      const result: Money = bank.reduce(Money.dollar(1), 'USD');
+      expect( Money.dollar(1) ).toEqual( result );
+    });
+    test('Reduce Same Currency Money Test', ()=>{
+      expect( new Bank().getRate('USD','USD') ).toEqual(1);
+    })
+    test('Reduce Different Currency Money Test', ()=>{
+      const bank: Bank = new Bank();
+      bank.addRate('CHF', 'USD', 2);
+      const result: Money = bank.reduce(Money.franc(2), 'USD');
+      expect( Money.dollar(1) ).toEqual( result );
+    });
+  });
+  describe.skip('Dollar & Franc Calculation', ()=>{
+    test('Dollar Multifly + Equal Test', () => {
+      const five_dollars = Money.dollar(5);
+      expect( five_dollars.multifly(3) ).toEqual(Money.dollar(15));
+      expect( five_dollars.multifly(5) ).toEqual(Money.dollar(25));
+      expect( (<Money>five_dollars.multifly(3)).equals(Money.dollar(15)) ).toBeTruthy();   // Money.multifly 에서 Expression 을 반환하여
+      expect( (<Money>five_dollars.multifly(5)).equals(Money.dollar(25)) ).toBeTruthy();   // Money.equals 가 동작하지 않는 문제 발생
+      expect( (<Money>five_dollars.multifly(100)).equals(Money.dollar(999)) ).toBeFalsy(); // → 일단 임시로 Money 로 캐스팅하는것으로 테스트 회피
+      expect( (<Money>five_dollars.multifly(100)).equals(Money.franc(100)) ).toBeFalsy();  // → 추후 Expression.equals 구현 고려해야함!
+    });
+    test('Franc Multifly + Equal Test', () => {
+      const ten_francs = Money.franc(10);
+      expect( ten_francs.multifly(2) ).toEqual(Money.franc(20));
+      expect( ten_francs.multifly(8) ).toEqual(Money.franc(80));
+      expect( (<Money>ten_francs.multifly(2)).equals(Money.franc(20)) ).toBeTruthy();  // 상동
+      expect( (<Money>ten_francs.multifly(8)).equals(Money.franc(80)) ).toBeTruthy();
+    });
+    test('Dollar, Franc Equal Test', () => {
+      expect( (Money.dollar(5)).equals(Money.dollar(5)) ).toBeTruthy();
+      expect( (Money.dollar(5)).equals(Money.dollar(-5)) ).toBeFalsy();
+      expect( (Money.franc(10)).equals(Money.franc(10)) ).toBeTruthy();
+      expect( (Money.franc(10)).equals(Money.franc(-10)) ).toBeFalsy();
+      expect( (Money.dollar(5)).equals(Money.franc(5)) ).toBeFalsy();
+    });
+    test('Currency Compare Test', ()=>{
+      expect( Money.dollar(1).getCurrency() ).toEqual('USD');
+      expect( Money.franc(1).getCurrency() ).toEqual('CHF');
+    });
+  });  
+}

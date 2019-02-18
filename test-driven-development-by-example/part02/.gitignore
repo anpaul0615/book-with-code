@@ -1,0 +1,5 @@
+# venv directories
+venv
+
+# backup directories
+.bak
