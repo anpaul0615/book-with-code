@@ -34,4 +34,21 @@ describe('Stack', ()=>{
 		expect( stack.getSize() ).toEqual( 0 );
 		expect( stack.peek() ).toEqual( null );
 	});
+
+	test('Dynamic Capacity Test', ()=>{
+		const stack = new Stack();
+		const numbers = [ 1, 2, 3, 4, 5 ];
+		expect( stack.getSize() ).toEqual( 0 );
+		expect( stack.getCapacity() ).toEqual( 8 );
+		for (let n of numbers) {
+			stack.push(n);
+		}
+		expect( stack.getSize() ).toEqual( 5 );
+		expect( stack.getCapacity() ).toEqual( 8 );
+		for (let n of numbers) {
+			stack.push(n);
+		}
+		expect( stack.getSize() ).toEqual( 10 );
+		expect( stack.getCapacity() ).toEqual( 16 );
+	});
 });

@@ -3,18 +3,17 @@ export default class Stack {
 	private capacity: number;
 	private size: number;
 
-	constructor(capacity: number) {
+	constructor(capacity: number = 8) {
 		this.items = new Array(capacity);
 		this.capacity = capacity;
 		this.size = 0;
 	}
 
-	push(item: any): boolean {
+	push(item: any): void {
 		if (this.size === this.capacity) {
-			return false;
+			this.setCapacity(this.capacity * 2);
 		}
 		this.items[this.size++] = item;
-		return true;
 	}
 
 	pop(): any {
@@ -46,5 +45,24 @@ export default class Stack {
 
 	getSize(): number {
 		return this.size;
+	}
+
+	getCapacity(): number {
+		return this.capacity;
+	}
+
+	setCapacity(capacity: number): number {
+		if (capacity < this.capacity) {
+			return this.capacity;
+		}
+		const newItems = new Array(capacity);
+		const oldCapacity = this.capacity;
+		for (let i = 0; i < oldCapacity; i++) {
+			newItems[i] = this.items[i];
+		}
+		delete this.items;
+		this.items = newItems;
+		this.capacity = capacity;
+		return this.capacity;
 	}
 }
