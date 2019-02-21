@@ -1,0 +1,8 @@
+# package directories
+node_modules
+
+# package-lock.json
+package-lock.json
+
+# backup directories/files
+**/*.bak*
