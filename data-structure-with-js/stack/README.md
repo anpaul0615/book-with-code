@@ -16,3 +16,15 @@ class Stack {
 }
 ```
 
+
+## 완성된 Stack 클래스
+
+- [Stack 클래스](./Stack.ts)
+- [Stack 클래스 테스트코드](./Stack.test.ts)
+
+
+## Stack 응용 예제
+
+- [진수 변환](./Stack.application.test.ts)
+
+
