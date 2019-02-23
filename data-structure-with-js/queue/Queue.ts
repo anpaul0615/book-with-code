@@ -1,7 +1,7 @@
 export default class Queue {
-	private items: Array<any>;
-	private capacity: number;
-	private size: number;
+	protected items: Array<any>;
+	protected capacity: number;
+	protected size: number;
 
 	constructor(capacity: number = 8) {
 		this.items = new Array(capacity);
