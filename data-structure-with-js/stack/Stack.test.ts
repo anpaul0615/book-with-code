@@ -20,6 +20,8 @@ describe('Stack', ()=>{
 		expect( stack.pop() ).toEqual( numbers[(numbers.length - 1) - 0] );
 		expect( stack.pop() ).toEqual( numbers[(numbers.length - 1) - 1] );
 		expect( stack.pop() ).toEqual( numbers[(numbers.length - 1) - 2] );
+		expect( stack.getSize() ).toEqual( numbers.length - 3 );
+		expect( stack.peek() ).toEqual( numbers[(numbers.length - 1) - 3] );
 	});
 
 	test('IsEmpty/Clear Test', ()=>{

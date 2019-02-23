@@ -7,6 +7,9 @@ export default class Stack {
 		this.items = new Array(capacity);
 		this.capacity = capacity;
 		this.size = 0;
+		for (let i = 0; i < capacity; i++) {
+			this.items[i] = null;
+		}
 	}
 
 	push(item: any): void {
@@ -20,7 +23,11 @@ export default class Stack {
 		if (this.isEmpty()) {
 			return null;
 		}
-		return this.items[--this.size];
+		const item = this.peek();
+		delete this.items[this.size - 1];
+		this.items[this.size - 1] = null;
+		this.size--;
+		return item;
 	}
 
 	peek(): any {
