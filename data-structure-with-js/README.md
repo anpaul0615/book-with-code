@@ -14,7 +14,7 @@
 - [2장 배열](./array/README.md)
 - [3장 스택](./stack/README.md)
 - [4장 큐](./queue/README.md)
-- 5장 연결리스트
+- [5장 연결리스트](./linked-list/README.md)
 - 6장 집합
 - 7장 딕셔너리와 해시
 - 8장 트리
