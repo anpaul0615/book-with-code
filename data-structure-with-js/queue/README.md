@@ -23,3 +23,9 @@ class Queue {
 - [Queue 클래스 테스트코드](./Queue.test.ts)
 
 
+## Queue 응용 예제
+
+- [우선순위 큐](./PriorityQueue.test.ts)
+- [원형 큐](./CircularQueue.ts)
+- [뜨거운감자 게임](./Queue.application.test.ts)
+
