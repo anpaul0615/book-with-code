@@ -1,15 +1,17 @@
 export class LinkedListNode {
 	data:any;
 	next:this;
+	prev:this;
 	constructor(data:any) {
 		this.data = data;
 		this.next = null;
+		this.prev = null;
 	}
 }
 
 export default class LinkedList {
-	private size:number;
-	private head:LinkedListNode;
+	protected size:number;
+	protected head:LinkedListNode;
 	
 	constructor() {
 		this.size = 0;

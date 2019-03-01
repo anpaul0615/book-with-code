@@ -26,3 +26,9 @@ class LinkedListNode {
 - [LinkedList 클래스](./LinkedList.ts)
 - [LinkedList 클래스 테스트코드](./LinkedList.test.ts)
 
+
+## LinkedList 응용 예제
+
+- [DoubleLinkedList](./DoubleLinkedList.ts)
+
+
