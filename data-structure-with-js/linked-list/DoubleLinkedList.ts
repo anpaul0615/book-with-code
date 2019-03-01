@@ -1,7 +1,7 @@
 import LinkedList, { LinkedListNode } from './LinkedList';
 
 export default class DoubleLinkedList extends LinkedList {
-	private tail:LinkedListNode;
+	protected tail:LinkedListNode;
 	constructor() {
 		super();
 		this.tail = null;
