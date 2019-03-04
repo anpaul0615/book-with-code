@@ -12,6 +12,10 @@ class Set {
 	getValues();
 	getSize();
 	clear();
+	union(other:Set);
+	intersection(other:Set);
+	difference(other:Set);
+	subset(other:Set);
 }
 ```
 

@@ -48,4 +48,52 @@ export default class Set {
 		this.items = new Object();
 		this.size = 0;
 	}
+
+	union(other:Set):Set {
+		const unionSet = new Set();
+		const thisValues = this.getValues();
+		for (let v of thisValues) {
+			unionSet.add(v);
+		}
+		const otherValues = other.getValues();
+		for (let v of otherValues) {
+			unionSet.add(v);
+		}
+		return unionSet;
+	}
+
+	intersection(other:Set):Set {
+		const intersectionSet = new Set();
+		const thisValues = this.getValues();
+		for (let v of thisValues) {
+			if (other.has(v)) {
+				intersectionSet.add(v);
+			}
+		}
+		return intersectionSet;
+	}
+
+	difference(other:Set):Set {
+		const differenceSet = new Set();
+		const thisValues = this.getValues();
+		for (let v of thisValues) {
+			if (other.has(v) === false) {
+				differenceSet.add(v);
+			}
+		}
+		return differenceSet;
+	}
+
+	subset(other:Set):boolean {
+		if (this.getSize() > other.getSize()) {
+			return false;
+		}
+		const thisValues = this.getValues();
+		for (let v of thisValues) {
+			if (other.has(v) === false) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
