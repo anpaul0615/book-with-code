@@ -17,3 +17,9 @@ class Dictionary {
 }
 ```
 
+
+## 완성된 Dictionary 클래스
+
+- [Dictionary 클래스](./Dictionary.ts)
+- [Dictionary 클래스 테스트코드](./Dictionary.test.ts)
+
