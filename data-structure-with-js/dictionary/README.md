@@ -41,3 +41,8 @@ class Hashtable {
 - [Hashtable 클래스](./Hashtable.ts)
 - [Hashtable 클래스 테스트코드](./Hashtable.test.ts)
 
+
+## Hashtable 충돌 문제 해결
+
+- 체이닝 (separate chaining)
+- 선형탐색 (linear probing)

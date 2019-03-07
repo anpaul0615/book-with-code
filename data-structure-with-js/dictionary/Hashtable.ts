@@ -1,5 +1,14 @@
+export class KeyDataPair {
+	public key:any;
+	public data:any;
+	constructor(key:any, data:any) {
+		this.key = key;
+		this.data = data;
+	}
+}
+
 export default class Hashtable {
-	private table: Array<any>;
+	private table: Array<KeyDataPair>;
 
 	constructor() {
 		this.table = new Array();
@@ -15,14 +24,28 @@ export default class Hashtable {
 
 	put(key:string, data:any):void {
 		const position = this.loseloseHashCode(key);
-		this.table[position] = data;
+		this.table[position] = new KeyDataPair(key, data);
 	}
 
 	get(key:string):any {
-		return this.table[this.loseloseHashCode(key)];
+		const position = this.loseloseHashCode(key);
+		return this.table[position] ? this.table[position].data : undefined;
 	}
 
 	remove(key:string):void {
-		this.table[this.loseloseHashCode(key)] = undefined;
+		const position = this.loseloseHashCode(key);
+		this.table[position] = undefined;
+	}
+
+	getItems():Array<any> {
+		return this.table.map( (val,idx) => {
+			if (val !== undefined) {
+				return { hash:idx, key:val.key, data:val.data };
+			}
+		}).filter(e => e !== undefined);
+	}
+
+	getSize():number {
+		return this.getItems().length;
 	}
 }
