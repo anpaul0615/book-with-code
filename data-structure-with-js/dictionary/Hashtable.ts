@@ -8,13 +8,17 @@ export class KeyDataPair {
 }
 
 export default class Hashtable {
-	private table: Array<KeyDataPair>;
+	protected table: Array<any>;
 
 	constructor() {
-		this.table = new Array();
+		this.initStore();
 	}
 
-	private loseloseHashCode(key:string):number {
+	protected  initStore() {
+		this.table = new Array<KeyDataPair>();
+	}
+
+	protected loseloseHashCode(key: string): number {
 		let hash = 0;
 		for (let i = 0; i < key.length; i++) {
 			hash += key.charCodeAt(i);

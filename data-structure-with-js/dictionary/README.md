@@ -44,5 +44,5 @@ class Hashtable {
 
 ## Hashtable 충돌 문제 해결
 
-- 체이닝 (separate chaining)
+- [체이닝 (separate chaining)](./ChainingHashtable.ts)
 - 선형탐색 (linear probing)
