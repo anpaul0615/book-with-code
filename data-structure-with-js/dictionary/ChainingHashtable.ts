@@ -32,7 +32,7 @@ export default class ChaningHashtable extends Hashtable {
 	}
 
 	put(key: string, data: any): void {
-		const position = this.loseloseHashCode(key);
+		const position = this.createHash(key);
 		if (this.table[position] === undefined)
 			this.table[position] = new ChainingKeyDataPair(key, data);
 		else
@@ -40,7 +40,7 @@ export default class ChaningHashtable extends Hashtable {
 	}
 
 	get(key: string): any {
-		const position = this.loseloseHashCode(key);
+		const position = this.createHash(key);
 		if (this.table[position] !== undefined) {
 			let current: ChainingKeyDataPair = this.table[position];
 			while (current.next !== null) {
@@ -57,7 +57,7 @@ export default class ChaningHashtable extends Hashtable {
 	}
 
 	remove(key:string):boolean {
-		const position = this.loseloseHashCode(key);
+		const position = this.createHash(key);
 		if (this.table[position] === undefined) {
 			return false;
 		}

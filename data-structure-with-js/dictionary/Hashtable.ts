@@ -18,6 +18,10 @@ export default class Hashtable {
 		this.table = new Array<KeyDataPair>();
 	}
 
+	protected createHash(key:string):number {
+		return this.djb2HashCode(key);
+	}
+
 	protected loseloseHashCode(key: string): number {
 		let hash = 0;
 		for (let i = 0; i < key.length; i++) {
@@ -26,18 +30,26 @@ export default class Hashtable {
 		return hash % 37;
 	}
 
+	protected djb2HashCode(key:string):number {
+		let hash = 5381;
+		for(let i = 0; i < key.length; i++) {
+			hash = hash * 33 + key.charCodeAt(i);
+		}
+		return hash % 1013;
+	}
+
 	put(key:string, data:any):void {
-		const position = this.loseloseHashCode(key);
+		const position = this.createHash(key);
 		this.table[position] = new KeyDataPair(key, data);
 	}
 
 	get(key:string):any {
-		const position = this.loseloseHashCode(key);
+		const position = this.createHash(key);
 		return this.table[position] ? this.table[position].data : undefined;
 	}
 
 	remove(key:string):void {
-		const position = this.loseloseHashCode(key);
+		const position = this.createHash(key);
 		this.table[position] = undefined;
 	}
 
