@@ -17,7 +17,7 @@
 - [5장 연결리스트](./linked-list/README.md)
 - [6장 집합](./set/README.md)
 - [7장 딕셔너리와 해시](./dictionary/README.md)
-- 8장 트리
+- [8장 트리](./tree/README.md)
 - 9장 그래프
 - 10장 정렬과 검색 알고리즘
 - 11장 그 밖의 알고리즘
