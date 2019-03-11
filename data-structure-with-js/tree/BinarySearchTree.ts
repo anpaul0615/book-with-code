@@ -33,10 +33,40 @@ export default class BinarySearchTree {
 	}
 
 	search(key:any):boolean { return false; }
-	inOrderTraverse(node:Node, callback:Function):void {}
-	preOrderTraverse(node:Node, callback:Function):void {}
-	postOrderTraverse(node:Node, callback:Function):void {}
 	min():any {}
 	max():any {}
 	remove(key:any):void {}
+
+	inOrderTraverse(callback:Function):void {
+		this.inOrderTraverseNode(this.root, callback);
+	}
+	private inOrderTraverseNode(node:Node, callback:Function):void {
+		if (node !== null) {
+			this.inOrderTraverseNode(node.left, callback);
+			callback(node.key);
+			this.inOrderTraverseNode(node.right, callback);
+		}
+	}
+
+	preOrderTraverse(callback:Function):void {
+		this.preOrderTraverseNode(this.root, callback);
+	}
+	private preOrderTraverseNode(node:Node, callback:Function):void {
+		if (node !== null) {
+			callback(node.key);
+			this.preOrderTraverseNode(node.left, callback);
+			this.preOrderTraverseNode(node.right, callback);
+		}
+	}
+	
+	postOrderTraverse(callback:Function):void {
+		this.postOrderTraverseNode(this.root, callback);
+	}
+	private postOrderTraverseNode(node:Node, callback:Function):void {
+		if (node !== null) {
+			this.postOrderTraverseNode(node.left, callback);
+			this.postOrderTraverseNode(node.right, callback);
+			callback(node.key);
+		}
+	}
 }
