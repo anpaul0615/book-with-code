@@ -12,10 +12,10 @@ describe('BinarySearchTree', ()=>{
 		for (let ch of message) {
 			tree.insert(ch);
 		}
-		// for (let ch of message) {
-		// 	expect( tree.search(ch) ).toEqual( true );
-		// }
-		// expect( tree.min() ).toEqual( 'd' );
-		// expect( tree.max() ).toEqual( 'w' );
+		for (let ch of message) {
+			expect( tree.search(ch) ).toEqual( true );
+		}
+		expect( tree.min() ).toEqual( ' ' );
+		expect( tree.max() ).toEqual( 'w' );
 	});
 });

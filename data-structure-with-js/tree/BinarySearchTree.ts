@@ -32,9 +32,38 @@ export default class BinarySearchTree {
 		}
 	}
 
-	search(key:any):boolean { return false; }
-	min():any {}
-	max():any {}
+	search(key:any):boolean {
+		return this.searchNode(this.root, key);
+	}
+	private searchNode(node:Node, key:any):boolean {
+		if (node === null) return false;  // not found
+		if (key < node.key) return this.searchNode(node.left, key);  // traverse left-tree
+		else if (key > node.key) return this.searchNode(node.right, key);  // traverse right-tree
+		else return true;  // found
+	}
+
+	min():any {
+		return this.minNode(this.root);
+	}
+	private minNode(node:Node):any {
+		if (node === null) return null;
+		while (node && node.left !== null) {  // find furthest left-side-node
+			node = node.left;
+		}
+		return node.key;
+	}
+
+	max():any {
+		return this.maxNode(this.root);
+	}
+	private maxNode(node:Node):any {
+		if (node === null) return null;
+		while (node && node.right !== null) {  // find furthest right-side-node
+			node = node.right;
+		}
+		return node.key;
+	}
+
 	remove(key:any):void {}
 
 	inOrderTraverse(callback:Function):void {
