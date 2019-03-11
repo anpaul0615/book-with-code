@@ -1,27 +1,27 @@
-export class Node {
-	key:any;
-	left:Node;
-	right:Node;
-	constructor(key:any) {
+export class Node<T> {
+	key:T;
+	left:Node<T>;
+	right:Node<T>;
+	constructor(key:T) {
 		this.key = key;
 		this.left = null;
 		this.right = null;
 	}
 }
 
-export default class BinarySearchTree {
-	private root:Node;
+export default class BinarySearchTree<T> {
+	private root:Node<T>;
 
 	constructor() {
 		this.root = null;
 	}
 	
-	insert(key:any):void {
-		let newNode = new Node(key);
+	insert(key:T):void {
+		let newNode = new Node<T>(key);
 		if (this.root === null) this.root = newNode;
 		else this.insertNode(this.root, newNode);
 	}
-	private insertNode(targetNode:Node, newNode:Node) {
+	private insertNode(targetNode:Node<T>, newNode:Node<T>) {
 		if (newNode.key < targetNode.key) {
 			if (targetNode.left === null) targetNode.left = newNode;
 			else this.insertNode(targetNode.left, newNode);
@@ -32,20 +32,20 @@ export default class BinarySearchTree {
 		}
 	}
 
-	search(key:any):boolean {
+	search(key:T):boolean {
 		return this.searchNode(this.root, key);
 	}
-	private searchNode(node:Node, key:any):boolean {
+	private searchNode(node:Node<T>, key:T):boolean {
 		if (node === null) return false;  // not found
 		if (key < node.key) return this.searchNode(node.left, key);  // traverse left-tree
 		else if (key > node.key) return this.searchNode(node.right, key);  // traverse right-tree
 		else return true;  // found
 	}
 
-	min():any {
+	min():T {
 		return this.minNode(this.root);
 	}
-	private minNode(node:Node):any {
+	private minNode(node:Node<T>):T {
 		if (node === null) return null;
 		while (node && node.left !== null) {  // find furthest left-side-node
 			node = node.left;
@@ -53,10 +53,10 @@ export default class BinarySearchTree {
 		return node.key;
 	}
 
-	max():any {
+	max():T {
 		return this.maxNode(this.root);
 	}
-	private maxNode(node:Node):any {
+	private maxNode(node:Node<T>):T {
 		if (node === null) return null;
 		while (node && node.right !== null) {  // find furthest right-side-node
 			node = node.right;
@@ -64,12 +64,12 @@ export default class BinarySearchTree {
 		return node.key;
 	}
 
-	remove(key:any):void {}
+	remove(key:T):void {}
 
 	inOrderTraverse(callback:Function):void {
 		this.inOrderTraverseNode(this.root, callback);
 	}
-	private inOrderTraverseNode(node:Node, callback:Function):void {
+	private inOrderTraverseNode(node:Node<T>, callback:Function):void {
 		if (node !== null) {
 			this.inOrderTraverseNode(node.left, callback);
 			callback(node.key);
@@ -80,7 +80,7 @@ export default class BinarySearchTree {
 	preOrderTraverse(callback:Function):void {
 		this.preOrderTraverseNode(this.root, callback);
 	}
-	private preOrderTraverseNode(node:Node, callback:Function):void {
+	private preOrderTraverseNode(node:Node<T>, callback:Function):void {
 		if (node !== null) {
 			callback(node.key);
 			this.preOrderTraverseNode(node.left, callback);
@@ -91,7 +91,7 @@ export default class BinarySearchTree {
 	postOrderTraverse(callback:Function):void {
 		this.postOrderTraverseNode(this.root, callback);
 	}
-	private postOrderTraverseNode(node:Node, callback:Function):void {
+	private postOrderTraverseNode(node:Node<T>, callback:Function):void {
 		if (node !== null) {
 			this.postOrderTraverseNode(node.left, callback);
 			this.postOrderTraverseNode(node.right, callback);

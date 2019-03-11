@@ -3,21 +3,21 @@
 ## BinarySearchTree 클래스 ADT
 
 ```typescript
-class BinarySearchTree {
-	private root:Node;
-	insert(key:any):void;
-	search(key:any):boolean;
+class BinarySearchTree<T> {
+	private root:Node<T>;
+	insert(key:T):void;
+	search(key:T):boolean;
 	inOrderTraverse(callback:Function):void;
 	preOrderTraverse(callback:Function):void;
 	postOrderTraverse(callback:Function):void;
-	min():any;
-	max():any;
-	remove(key:any):void;
+	min():T;
+	max():T;
+	remove(key:T):void;
 }
-class Node {
-	key:any;
-	left:Node;
-	right:Node;
+class Node<T> {
+	key:T;
+	left:Node<T>;
+	right:Node<T>;
 }
 ```
 
