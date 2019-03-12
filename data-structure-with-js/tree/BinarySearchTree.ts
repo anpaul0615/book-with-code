@@ -64,7 +64,37 @@ export default class BinarySearchTree<T> {
 		return node.key;
 	}
 
-	remove(key:T):void {}
+	remove(key:T):void {
+		this.removeNode(this.root, key);
+	}
+	private removeNode(node:Node<T>, key:T):Node<T> {
+		if (node === null) {  // not found
+			return null;
+		}
+		if (key < node.key) {  // traverse left-tree
+			node.left = this.removeNode(node.left, key);
+			return node;
+		}
+		else if (key > node.key) {  // traverse right-tree
+			node.right = this.removeNode(node.right, key);
+			return node;
+		}
+		else {  // found
+			if (node.left === null && node.right === null) return node = null;  // remove leaf-node
+			if (node.left === null) return node = node.right;  // remove right-only-node
+			else if (node.right === null) return node = node.left;  // remove left-only-node
+			const aux:Node<T> = this.findMinNode(node.right);  // remove full-node (remove + replace)
+			node.key = aux.key;
+			node.right = this.removeNode(node.right, aux.key);
+			return node;
+		}
+	}
+	private findMinNode(node:Node<T>):Node<T> {
+		while (node && node.left !== null) {
+			node = node.left;
+		}
+		return node;
+	}
 
 	inOrderTraverse(callback:Function):void {
 		this.inOrderTraverseNode(this.root, callback);

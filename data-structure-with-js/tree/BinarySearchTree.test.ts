@@ -19,4 +19,15 @@ describe('BinarySearchTree', ()=>{
 		expect( tree.min() ).toEqual( ' ' );
 		expect( tree.max() ).toEqual( 'w' );
 	});
+
+	test('Remove Test', ()=>{
+		const tree:BinarySearchTree<string> = new BinarySearchTree<string>();
+		const message:string = 'hello world';
+		for (let ch of message) {
+			tree.insert(ch);
+		}
+		expect( tree.search('h') ).toEqual( true );
+		tree.remove('h');
+		expect( tree.search('h') ).toEqual( false );
+	});
 });
