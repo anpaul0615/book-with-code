@@ -21,3 +21,9 @@ class Node<T> {
 }
 ```
 
+
+## 완성된 BinarySearchTree 클래스
+
+- [BinarySearchTree 클래스](./BinarySearchTree.ts)
+- [BinarySearchTree 클래스 테스트코드](./BinarySearchTree.test.ts)
+
