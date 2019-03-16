@@ -1,12 +1,11 @@
 import Dictionary from '../dictionary/Dictionary';
-import LinkedList from '../linked-list/LinkedList';
 
 export default class Graph {
-	private vertices:LinkedList;
+	private vertices:Array<string>;
 	private adjacencies:Dictionary;
 
 	constructor() {
-		this.vertices = new LinkedList();
+		this.vertices = new Array();
 		this.adjacencies = new Dictionary();
 	}
 
@@ -14,8 +13,8 @@ export default class Graph {
 		if (this.vertices.indexOf(vertex) !== -1) {
 			return false;
 		}
-		this.vertices.append(vertex);
-		this.adjacencies.set(vertex, new LinkedList());
+		this.vertices.push(vertex);
+		this.adjacencies.set(vertex, new Array());
 		return true;
 	}
 
@@ -25,8 +24,8 @@ export default class Graph {
 		if (adjacency1 === null || adjacency2 === null) {
 			return false;
 		}
-		adjacency1.append(vertext2);
-		adjacency2.append(vertext1);
+		adjacency1.push(vertext2);
+		adjacency2.push(vertext1);
 		return true;
 	}
 
