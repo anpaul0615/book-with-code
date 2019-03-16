@@ -1,6 +1,10 @@
 import Dictionary from '../dictionary/Dictionary';
 import Queue from '../queue/Queue';
 
+interface MarkTable {
+	[key:string]: string
+}
+
 export default class Graph {
 	private vertices:Array<string>;
 	private adjacencies:Dictionary;
@@ -31,8 +35,8 @@ export default class Graph {
 	}
 
 	bfs(vertex:string, callback:Function) {
-		let marks = this.initializeMark();
-		let queue = new Queue();
+		let marks:MarkTable = this.initializeMark();
+		let queue:Queue = new Queue();
 		// insert start-node to wait-queue
 		queue.enqueue(vertex);
 		// loop with traversing nodes in wait-queue
@@ -56,13 +60,36 @@ export default class Graph {
 			callback(target);
 		}
 	}
-	private initializeMark() {
-		let marks:{ [key:string]: string } = {};
+	private initializeMark():MarkTable {
+		let marks:MarkTable = {};
 		for (let i = 0; i < this.vertices.length; i++) {
 			marks[this.vertices[i]] = 'white';  // mark all-nodes to wait-mark (not visit, not traverse)
 		}
 		return marks;
 	}
 
-	dfs() {}
+	dfs(callback:Function) {
+		let marks:MarkTable = this.initializeMark();
+		// loop with visiting all-wait-nodes
+		for (let i = 0; i < this.vertices.length; i++) {
+			if (marks[this.vertices[i]] === 'white') {
+				this.dfsVisit(this.vertices[i], marks, callback);
+			}
+		}
+	}
+	private dfsVisit(target:string, marks:MarkTable, callback:Function) {
+		// mark target-node to visit-mark (visit, but not backtrack)
+		marks[target] = 'grey';
+		callback(target);
+		// loop with visiting all-wait-nodes (for target's nearby-nodes)
+		let neighbors = this.adjacencies.get(target);
+		for (let i = 0; i < neighbors.length; i++) {
+			let next = neighbors[i];
+			if (marks[next] === 'white') {
+				this.dfsVisit(next, marks, callback);
+			}
+		}
+		// mark target-node to backtrack-mark (visit and backtrack)
+		marks[target] = 'black';
+	}
 }
