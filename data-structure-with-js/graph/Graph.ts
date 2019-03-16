@@ -1,4 +1,5 @@
 import Dictionary from '../dictionary/Dictionary';
+import Queue from '../queue/Queue';
 
 export default class Graph {
 	private vertices:Array<string>;
@@ -29,6 +30,39 @@ export default class Graph {
 		return true;
 	}
 
-	bfs() {}
+	bfs(vertex:string, callback:Function) {
+		let marks = this.initializeMark();
+		let queue = new Queue();
+		// insert start-node to wait-queue
+		queue.enqueue(vertex);
+		// loop with traversing nodes in wait-queue
+		while (queue.isEmpty() === false) {
+			// 1) get target-node from wait-queue
+			const target = queue.dequeue();
+			// 2) get nearby-nodes from target-node
+			const neighbors = this.adjacencies.get(target);
+			// 3) mark target-node to visit-mark (visit, but not traverse)
+			marks[target] = 'grey';
+			// 4) loop with visiting and marking nearby-nodes
+			for (let i =0; i < neighbors.length; i++) {
+				let w = neighbors[i];
+				if (marks[w] === 'white') { // if wait-mark, change to visit-mark (visit, but not traverse)
+					marks[w] = 'grey';
+					queue.enqueue(w);
+				}
+			}
+			// 5) mark target-node to traverse-mark (visit and traverse)
+			marks[target] = 'black';
+			callback(target);
+		}
+	}
+	private initializeMark() {
+		let marks:{ [key:string]: string } = {};
+		for (let i = 0; i < this.vertices.length; i++) {
+			marks[this.vertices[i]] = 'white';  // mark all-nodes to wait-mark (not visit, not traverse)
+		}
+		return marks;
+	}
+
 	dfs() {}
 }
