@@ -12,8 +12,7 @@
 
 - 1부 딥러닝의 기초
   - [1장 딥러닝이란 무엇인가?](./ch01-what-is-deep-learning/README.md)
-  - 1장 딥러닝이란 무엇인가?
-  - 2장 신경망의 수학적 구성 요소
+  - [2장 신경망의 수학적 구성 요소](./ch02-the-mathematical-building-blocks-of-neural-networks/README.md)
   - 3장 신경망 시작하기
   - 4장 머신러닝의 기본 요소
 
