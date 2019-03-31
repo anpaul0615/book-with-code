@@ -412,5 +412,47 @@
 
 ## 2.5. 첫 번째 예제 다시 살펴보기
 
-## 2.6. 요약
+- 입력데이터 전처리
+  ```python
+  (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
 
+  train_images = train_images.reshape((60000, 28*28))
+  train_images = train_images.astype('float32') / 255
+
+  test_images = test_images.reshape((10000, 28*28))
+  test_images = test_images.astype('float32') / 255
+  ```
+  - 입력데이터는 이미지 데이터임.
+  - 데이터타입은 float32, 훈련데이터는 (6000, 784) 크기, 테스트데이터는 (10000,784) 크기의 넘파이 배열로 구성됨.
+
+- 신경망 구성
+  ```python
+  network = models.Sequential()
+  network.add(layers.Dense(512, activation='relu', input_shape=(28*28,)))
+  network.add(layers.Dense(10, activation='softmax'))
+  ```
+  - 네트워크(신경망) 은 두 개의 Dense 층이 연결되어 있는 구조임.
+  - 각 층에서는 가중치 텐서와 입력데이터에 대한 텐서 연산을 수행함.
+  - 가중치 텐서는 네트워크가 (학습결과에 따른) 정보를 저장하는곳임.
+
+- 네트워크 컴파일
+  ```python
+  network.compile(optimizer='rmsprop',
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+  ```
+  - categorical_crossentropy 는 손실함수이며, 가중치 텐서에 대한 피드백 신호로 사용됨.
+  - rmsprop 은 옵티마이저이며, 미니배치 확률적 경사하강법 적용 과정에서 네트워크 최적화를 수행함.
+
+- 훈련 반복
+  ```python
+  network.fit(train_images, train_labels, epochs=5, batch_size=128)
+  ```
+  - 네트워크가 128개의 샘플단위로 나뉘어 훈련 절차를 진행하고, 그것을 총 5회 반복함
+  - 전체 훈련데이터에 수행되는 각 반복을 에포크(epoch) 라고 함.
+  - 각 반복마다 네트워크 배치에서 발생한 손실에 대한 그래디언트를 계산하고, 그에 맞추어 가중치를 업데이트함.
+  - 총 60000개의 훈련데이터를 128사이즈의 미니배치로 나누면 총 469개의 배치가 만들어지고, 이를 5에포크만큼 반복하면 이 네트워크는 총 2,345회 만큼의 그래디언트 업데이트를 수행하게 됨.
+
+
+
+## 2.6. 요약
