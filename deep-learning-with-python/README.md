@@ -14,7 +14,7 @@
   - [1장 딥러닝이란 무엇인가?](./ch01-what-is-deep-learning/README.md)
   - [2장 신경망의 수학적 구성 요소](./ch02-the-mathematical-building-blocks-of-neural-networks/README.md)
   - [3장 신경망 시작하기](./ch03-getting-started-with-neural-networks/README.md)
-  - 4장 머신러닝의 기본 요소
+  - [4장 머신러닝의 기본 요소](./ch04-fundamentals-of-machine-learning/README.md)
 
 - 2부 실전 딥러닝
   - 5장 컴퓨터 비전을 위한 딥러닝
