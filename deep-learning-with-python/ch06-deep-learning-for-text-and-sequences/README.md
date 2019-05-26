@@ -163,4 +163,8 @@ k_t = activation(dot(state_t, Uk) + dot(input_t, Wk) + bk)  // tanh
 
 ## 6.3. 순환 신경망의 고급 사용법
 
+- [코드 실습 : 기온 예측 문제](./advanced-usage-of-recurrent-neural-networks.ipynb)
+
+
+
 ## 6.4. 컨브넷을 이용한 시퀀스 처리
