@@ -122,3 +122,75 @@ function yourCode() {
 }
 ```
 
+### 코드스피치 문제풀이 및 구현
+
+```javascript
+const prime1 = (end) => {
+  const prime = [], num = [];
+  let curr = 2, i = curr;
+  while(i <= end) num.push(i++);
+  while(num.length) {
+    prime.push(curr = num.shift());
+    i = num.length;
+    while(i--) if(num[i] % curr == 0) num.splice(i,1);
+    if(curr*curr > num[num.length-1]) break;
+  }
+  return prime.concat(num);
+};
+```
+
+```javascript
+const prime2 = (end) => {
+  const prime = [ 2 ], num = [];
+  let curr = 2, i = 3, j;
+  while(i <= end) {
+    num.push(i);
+    i += 2;  // 홀수만 탐색리스트 추가
+  }
+  while(num.length) {
+    prime.push(curr = num.shift());
+    i = num.length;
+    j = curr * curr;  // 역방향 배수제거 기준값
+    while(i--) {
+      if(num[i] < j) break;  // 제곱수 이하는 건너뜀
+      if(num[i] % curr == 0) num.splice(i,1);
+    }
+    if(curr*curr > num[num.length-1]) break;
+  }
+  return prime.concat(num);
+};
+```
+
+```javascript
+const prime3 = (end) => {
+  const num = [ 2 ];  // 배열을 하나로 통합
+  for(let i=3; i<=end; i+=2) num.push(i);
+  for(let k=1; k<num.length; k++){
+    let curr = num[k], min = curr*curr, i = num.length;
+    if(num[i-1] < min) break;
+    while(i--) {
+      if(num[i] < min) break;
+      if(num[i] % curr == 0) num.splice(i,1);
+    }
+  }
+  return num;
+};
+```
+
+```javascript
+const prime4 = (end) => {
+  const num = [ 2 ];
+  for(let i=3; i<=end; i+=2) num.push(i);
+  for(let i=1, j=num.length, curr; i<j; i++){
+    if(curr = num[i]){  // 0이 아닌값만 검사 (마킹안된값만 검사)
+      const min = curr*curr;
+      if(end<min) break;
+      for(let k=(min-1)/2; k<j; k+=curr){  // 현재 소수 제곱값부터 시작 + 현재 소수값 만큼씩 인덱스 이동
+        if(num[k] %curr == 0) num[k] = 0;  // splice 대신 0으로 마킹
+      }
+    }
+  }
+  return num.filter(v=>v);  // 0 으로 마킹되지 않은 값만 추출 (falsy-value)
+};
+```
+
