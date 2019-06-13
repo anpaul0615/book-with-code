@@ -22,7 +22,7 @@
 
 ## 구현
 
-### 교재 코드 재구성
+### 교재 코드 재구성 (루프기반 구현)
 
 ```javascript
 // "이동비용 배열" 초기화
@@ -104,6 +104,99 @@ while (nextMininumCost != 0) {
   else if (nextMininumPoint.y < currentPoint.y) direction = '↑';
   path.push({ x: nextMininumPoint.x, y:nextMininumPoint.y, direction });
 }
+
+// 디버그 출력
+console.log(path);
+```
+
+
+### 교재 코드 재구성 (재귀 구현)
+
+```javascript
+// "이동비용 배열" 초기화
+let moveCostMap = [
+  [5,5,4,2,1,1,1,2,2,3],
+  [5,4,3,2,1,1,2,2,3,4],
+  [5,4,2,1,1,2,2,4,5,5],
+  [4,4,2,1,2,2,3,3,4,5],
+  [4,3,1,1,4,3,3,3,4,5],
+  [3,1,1,5,4,3,2,3,4,5],
+  [2,1,3,4,3,3,2,2,3,4],
+  [1,1,3,4,3,2,1,1,2,3],
+  [2,1,1,3,4,2,2,3,4,4],
+  [3,2,1,1,3,3,3,3,4,5]
+];
+
+// "합계비용 배열" 초기화
+let costSummaryMap = moveCostMap.map(elist => elist.map(()=>Infinity));
+
+// map 사이즈
+const mapHeight = costSummaryMap.length;
+const mapWidth = costSummaryMap[0].length;
+
+// 출발지, 목적지 좌표
+const startPoint = { x: 4, y: 0 };
+const goalPoint = { x: 5, y: 9 };
+
+// 이동비용 계산 (목적지 → 출발)
+function calculateCostSummaryMap(x, y, cost) {
+  cost += moveCostMap[y][x];
+  if (cost >= costSummaryMap[y][x]) return;
+  costSummaryMap[y][x] = cost;
+  
+  if (x > 0) calculateCostSummaryMap(x - 1, y, cost);
+  if (y > 0) calculateCostSummaryMap(x, y - 1, cost);
+  if (x < mapWidth - 1) calculateCostSummaryMap(x + 1, y, cost);
+  if (y < mapHeight - 1) calculateCostSummaryMap(x, y + 1, cost);
+}
+calculateCostSummaryMap(goalPoint.x, goalPoint.y, -moveCostMap[goalPoint.y][goalPoint.x]);
+
+// 디버그 출력
+console.log(costSummaryMap);
+
+// 최단경로 계산 (출발지 → 목적지)
+let path = [];
+function calculatePath(x,y) {
+  let cost = Infinity;
+  let nextX, nextY;
+
+  if (x > 0 && costSummaryMap[y][x-1] < cost) {
+    cost = costSummaryMap[y][x-1];
+    nextX = x - 1;
+    nextY = y;
+  }
+  if (y > 0 && costSummaryMap[y-1][x] < cost) {
+    cost = costSummaryMap[y-1][x];
+    nextX = x;
+    nextY = y - 1;
+  }
+  if (x < mapWidth - 1 && costSummaryMap[y][x+1] < cost) {
+    cost = costSummaryMap[y][x+1];
+    nextX = x + 1;
+    nextY = y;
+  }
+  if (y < mapHeight - 1 && costSummaryMap[y+1][x] < cost) {
+    cost = costSummaryMap[y+1][x];
+    nextX = x;
+    nextY = y + 1;
+  }
+  if (cost == 0) {
+    return;   
+  }
+
+  let direction;
+  if (nextX > x) direction = '→';
+  else if (nextX < x) direction = '←';
+  else if (nextY > y) direction = '↓';
+  else if (nextY < y) direction = '↑';
+  path.push({ x: nextX, y:nextY, direction });
+
+  calculatePath(nextX, nextY);
+}
+
+path.push({ x: startPoint.x, y:startPoint.y, direction:null });
+calculatePath(startPoint.x, startPoint.y);
+path.push({ x: goalPoint.x, y:goalPoint.y, direction:null });
 
 // 디버그 출력
 console.log(path);
