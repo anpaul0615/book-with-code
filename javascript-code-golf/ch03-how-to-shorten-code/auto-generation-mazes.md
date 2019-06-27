@@ -243,3 +243,241 @@ var Xor = function(n) {
 }
 ```
 
+
+
+## 코드스피츠 문제풀이 및 구현
+
+### 교재 실습코드 구현 (구멍뚫기 알고리즘)
+
+```javascript
+function originalCode() {
+  // 변수초기화
+  var res = "";
+  // 미로초기화
+  var w = 55;
+  var h = 35;
+  var maze = new Array(w * h);
+  for (var y=1; y<h-1; y++) {
+    for (var x=1; x<w-1; x++) {
+      maze[x + w * y] = 1;
+    }
+  }
+  // 개시위치, 방향, 패턴
+  var startX = w - 5;
+  var startY = 4;
+  var dir = [ [-1,0], [0,-1], [1,0], [0,1] ];
+  var pattern = [
+    [0, 1, 2, 3],
+    [0, 1, 3, 2],
+    [0, 2, 1, 3],
+    [0, 2, 3, 1],
+    [0, 3, 1, 2],
+    [0, 3, 2, 1],
+    [1, 0, 2, 3],
+    [1, 0, 3, 2],
+    [1, 2, 0, 3],
+    [1, 2, 3, 0],
+    [1, 3, 0, 2],
+    [1, 3, 2, 0],
+    [2, 0, 1, 3],
+    [2, 0, 3, 1],
+    [2, 1, 0, 3],
+    [2, 1, 3, 0],
+    [2, 3, 0, 1],
+    [2, 3, 1, 0],
+    [3, 0, 1, 2],
+    [3, 0, 2, 1],
+    [3, 1, 0, 2],
+    [3, 1, 2, 0],
+    [3, 2, 0, 1],
+    [3, 2, 1, 0]];
+  // 구멍 뚫기
+  function dig(x,y) {
+    var type = (x+3) * (y+5) * 7 % pattern.length;
+    for (var i=0; i<dir.length; i++) {
+      var next = dir[pattern[type][i]];
+      if (maze[(x + next[0] * 2) + w * (y + next[1] * 2)] == 1) {
+        maze[(x + next[0] * 2) + w * (y + next[1] * 2)] = 0;
+        maze[(x + next[0]) + w * (y + next[1])] = 0;
+        dig(x + next[0] * 2, y + next[1] * 2);
+      }
+    }
+  }
+  dig(startX, startY);
+  // 실행 결과 생성
+  for (var y=0; y<h; y++) {
+    for (var x=0; x<w; x++) {
+      if (maze[x + w * y] == 1) res += "■";
+      else res += "□";
+    }
+    res += "\n";
+  }
+  // 결과를 리턴하고 종료
+  return res;
+}
+```
+
+
+### 코드스피츠 구현 (막대쓰러뜨리기 알고리즘)
+
+```javascript
+function mazeRender(title, maze) {
+  var x, y, w=maze[0].length, h=maze.length, res = '';
+  for (y=0; y<h; y++){
+    for (x=0; x<w; x++){
+      res += maze[y][x] > 0 ? '■' : '□';
+    }
+    res += '\n';
+  }
+  document.getElementById('result').innerHTML += '\n' + res + '\n\n';
+}
+function mazeSizeCheck(w, h) {
+  if (w<11 || h<11) throw '미로는 5*5 이상이어야 합니다.';
+  if (w%2==0 || h%2==0) throw '미로의 높이와 너비는 홀수값이어야 합니다.';
+}
+function rand(n) {
+  return (Math.random() * n) % n | 0;
+}
+function maze1(w, h) {
+  mazeSizeCheck(w, h);
+  var p, i, j, x, y, dir=[[1,0],[0,1],[-1,0],[0,-1]], maze=[];
+  // 지도 초기화
+  for (i=0,j=w*h; i<j; i++) {
+    y = i / w | 0;
+    x = i - y * w;
+    if (y == maze.length) maze.push([]);
+    maze[y].push(
+      x==0 || y==0 || x==w-1 || y==h-1 || 
+      (x%2==0 && y%2==0)
+      ? 1 : 0
+    );
+  }
+  // 미로 생성
+  for (j=2; j<h-1; j+=2)  {
+    for (i=2; i<w-1; i+=2) {
+      p = j==2 ? 4 : 3;
+      p = dir[rand(p)];
+      x = i + p[0];
+      y = j + p[1];
+      if (maze[y][x] == 1) i -= 2;
+      else maze[y][x] = 1;
+    }
+  }
+  return maze;
+}
+```
+
+
+### 코드스피츠 구현 (구멍뚫기 알고리즘)
+
+```javascript
+
+function maze2(w, h) {
+  if (w<11 || h<11) return '미로는 5*5 이상이어야 합니다.';
+  if (w%2==0 || h%2==0) return '미로의 높이와 너비는 홀수값이어야 합니다.';
+
+  // 지도 초기화
+  var create = function(w, h) {
+    var i, j, x, y, maze=[];
+    for (i=0, j=w*h; i<j; i++) {
+      y = i / w | 0;
+      x = i - y * w;
+      if (y == maze.length) maze.push([]);
+      maze[y].push(1);
+    }
+    return maze;
+  };
+
+  // 구멍 위치 찾기
+  var getDigPoints = function(startPoint, maze, dir) {
+    var i, j, d, p, digPoint, w=maze[0].length, h=maze.length;
+    // 뚫을 방향 및 위치 알아내기
+    d = dir[rand(dir.length)];
+    i = 0, digPoint=[];
+    while (i++ < 2) {
+      digPoint.push({x:startPoint.x + d.x * i, y:startPoint.y + d.y * i});
+    }
+    // 뚫을수있는지 검사
+    for (i=0, j=digPoint.length; i<j; i++) {
+      p = digPoint[i];
+      if (maze[p.y][p.x] == 0 || p.x==0 || p.y==0 || p.x==w-1 || p.y==h-1) return 0;
+    }
+    return digPoint;
+  };
+
+  // 구멍 뚫기
+  var dig = function(startPoint, maze, dir) {
+    var i, j, p, digPoints, ok = 0; 
+    while (digPoints = getDigPoints(startPoint, maze, dir)) {
+      for (i = 0, j = digPoints.length; i < j; i++) {
+        p = digPoints[i];
+        maze[p.y][p.x] = 0;
+        startPoint = p; //뚫은 마지막 지점을 시작점으로!
+        ok = 1;
+      }
+    }
+    return ok;
+  };
+
+  // 시작점 찾기
+  var findStartPoint = function(maze, dir) {
+    var x, y, d, startPoint=0, w=maze[0].length, h=maze.length, route=[], digPoints;
+    //뚫린 경로를 가져옴 (홀수좌표만)
+    for (x=1; x<w-1; x+=2) {
+      for (y=1; y<h-1; y+=2) {
+        if (maze[y][x] == 0) route.push({x:x,y:y});
+      }
+    }
+    //뚫린 경로가 없으면 아무 점이나 시작점으로 잡음
+    if (route.length == 0) {
+      startPoint = {x:rand(w / 2 - 1) * 2 + 1, y:rand(h / 2 - 1) * 2 + 1};
+      maze[startPoint.y][startPoint.x] = 0;
+      return startPoint;
+    }
+    //뚫린 경로에서 시작점을 랜덤으로 찾음
+    while (route.length > 0) {
+      d = dir.slice();
+      startPoint = route.splice(rand(route.length), 1)[0];
+      while (d.length) {
+        digPoints = getDigPoints(startPoint, maze, d.splice(rand(d.length), 1));
+        if (digPoints) return startPoint;
+      }
+      startPoint = 0;
+    }
+    return startPoint;
+  };
+
+  // 미로 생성
+  var dir = [{x:1,y:0},{x:0,y:1},{x:-1,y:0},{x:0,y:-1}];
+  var maze = create(w,h);
+  while (1) {
+    var startPoint = findStartPoint(maze, dir);
+    if (startPoint) {
+      while (!dig(startPoint, maze, dir)) {
+        startPoint = findStartPoint(maze, dir);
+      }
+    } else {
+      break;
+    }
+  }
+
+  // 미로 렌더링
+  var mazeRender = function(maze) {
+    var x, y, w=maze[0].length, h=maze.length, res = '';
+    for (y=0; y<h; y++){
+      for (x=0; x<w; x++){
+        res += maze[y][x] > 0 ? '■' : '□';
+      }
+      res += '\n';
+    }
+    return res;
+  };
+
+  // 미로 반환
+  return mazeRender(maze);
+}
+
+var result = maze2(31, 27);
+console.log(result);
+```
+
