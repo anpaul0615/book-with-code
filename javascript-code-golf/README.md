@@ -25,7 +25,7 @@
 
 - **4. 같은 목적을 달성하는 여러가지 기법**  
   [4.1. 계산식을 컴퓨터에 이해시키자 (알고리즘 문제 3)](./ch04-same-purpose-other-methods/calculator.md)  
-  [4.2. 그림을 쭈~욱 확대하자 (알고리즘 문제 4)](./ch04-same-purpose-other-methods/interpolation.md)    
+  [4.2. 그림을 쭈~욱 확대하자 (알고리즘 문제 4)](./ch04-same-purpose-other-methods/interpolation.md)  
 
 - **5. 짧은 코드로 복잡한 세상을 그리다**  
   5.1. 자기유사성의 세계 프랙탈 도형을 그리자 (코드골프 문제 4)  

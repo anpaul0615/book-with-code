@@ -270,3 +270,211 @@ function bicubic(imgSrc, imgDst) {
   }
 }
 ```
+
+
+### 코드스피츠 구현 코드
+
+```javascript
+/* 원본이미지 생성 함수 */
+const imgSrcCreate = () => {
+  noise.seed(0.23331);  // perlin.js 라이브러리
+  return (w, h) => {
+    const arr = [];
+    let v, r, g, b;
+    for (let y=0; y<h; y++) {
+      arr[y] = [];
+      for (let x=0; x<w; x++) {
+        let color = Math.abs(noise.perlin2(x/100, y/100)) * 256;
+        arr[y][x] = [color + Math.max(0, (25-color) * 8), color, color, 255];
+      }
+    }
+    arr.w = w;
+    arr.h = h;
+    return arr;
+  };
+})();
+
+/* 보간 함수 */
+const imgInterpolation = () => {
+  // 생성이미지 초기화
+  const emptyDst = (src, scaleX, scaleY) => {
+    const arr = [],
+      w = Math.floor(scaleX * src.w),
+      h = Math.floor(scaleY * src.h);
+    for (let y=0; y<h; y++) {
+      arr[y] = [];
+      for (let x=0; x<w; x++) {
+        arr[y][x] = [0, 0, 0, 255];
+      }
+    }
+    arr.w = w;
+    arr.h = h;
+    return arr;
+  };
+  return {
+    /* 최근방 이웃 보간법 */
+    nearestNeighbor: (src, scaleX, scaleY) => {
+      console.log("nearest-neighbor-interpolation", scaleX, scaleY);
+      const dst = emptyDst(src, scaleX, scaleY);
+      const dstW = dst.w, dstH = dst.h;
+      const srcW = src.w, srcH = src.h;
+      const ratioW = dstW / srcW, ratioH = dstH / srcH;
+      // 보간 처리
+      for (let y=0; y<dstH; y++) {
+        const dstRow = dst[y];
+        for (let x=0; x<dstW; x++) {
+          const x0 = Math.floor(x / ratioW);
+          const y0 = Math.floor(y / ratioH);
+          const color = src[y0][x0];
+          dstRow[x] = color.slice();
+        }
+      }
+      return dst;
+    },
+    /* 쌍 선형 보간법 */
+    bilinear: (src, scaleX, scaleY) => {
+      console.log("bilinear-interpolation", scaleX, scaleY);
+      const dst = emptyDst(src, scaleX, scaleY);
+      const dstW = dst.w, dstH = dst.h;
+      const srcW = src.w, srcH = src.h;
+      const ratioW = dstW / srcW, ratioH = dstH / srcH;
+      // 보간 처리
+      for (let y=0; y<dstH; y++) {
+        const dstRow = dst[y];
+        for (let x=0; x<dstW; x++) {
+          const x0 = Math.floor(x / ratioW);
+          const y0 = Math.floor(y / ratioH);
+          const x1 = Math.min(srcW - 1, x0 + 1);
+          const y1 = Math.min(srcH - 1, y0 + 1);
+          const col0 = src[y0][x0];
+          const col1 = src[y0][x1];
+          const col2 = src[y1][x0];
+          const col3 = src[y1][x1];
+          const rtX = x / ratioW - x0;
+          const rtY = y / ratioH - y0;
+          // 색 합산
+          for (let c=0; c<3; c++) {
+            dstRow[x][c] = Math.round(
+                (1 - rtX) * (1 - rtY) * col0[c]
+              +      rtX  * (1 - rtY) * col1[c]
+              + (1 - rtX) *      rtY  * col2[c]
+              +      rtX  *      rtY  * col3[c]
+            );
+          }
+        }
+      }
+      return dst;
+    },
+    /* 쌍 입방 보간법 */
+    bicubic: (src, scaleX, scaleY) => {
+      console.log("bicubic-interpolation", scaleX, scaleY);
+      const dst = emptyDst(src, scaleX, scaleY);
+      const dstW = dst.w, dstH = dst.h;
+      const srcW = src.w, srcH = src.h;
+      const ratioW = dstW / srcW, ratioH = dstH / srcH;
+      const xArr = [0, 0, 0, 0], yArr = [0, 0, 0, 0], colSum = [0, 0, 0, 0];
+      // 무게계산식
+      const wght = (d) => {
+        if (d < 1) // 0 <= d < 1.0 일때 : 1 - 2*d^2 + d^3
+          return 1 - 2 * d * d + d * d * d;
+        else if (d < 2) // 1.0 <= d < 2.0 일때 : 4 - 8*d + 5*d^2 - d^3
+          return 4 - 8*d + 5*d*d - d*d*d;
+        else // d >= 2.0 일때 : 0
+          return 0;
+      };
+      // 보간 처리
+      for (let y=0; y<dstH; y++) {
+        const dstRow = dst[y];
+        for (let x=0; x<dstW; x++) {
+          // X 4점, Y 4점을 취득
+          xArr[1] = Math.floor(x / ratioW);
+          yArr[1] = Math.floor(y / ratioH);
+          xArr[0] = Math.max(0, xArr[1]-1);
+          yArr[0] = Math.max(0, yArr[1]-1);
+          xArr[2] = Math.min(srcW-1, xArr[1]+1);
+          yArr[2] = Math.min(srcH-1, yArr[1]+1);
+          xArr[3] = Math.min(srcW-1, xArr[1]+2);
+          yArr[3] = Math.min(srcH-1, yArr[1]+2);
+          // 비율점
+          const rtX = x / scaleX - xArr[1];
+          const rtY = y / scaleY - yArr[1];
+          // 4*4=16칸의 색을 취득
+          colSum[0] = colSum[1] = colSum[2] = colSum[4] = 0;
+          for (let yC=0; yC<4; yC++) {
+            for (let xC=0; xC<4; xC++) {
+              const rgb = src[yArr[yC]][xArr[xC]];
+              const dX = Math.abs(rtX - (xC-1));
+              const dY = Math.abs(rtY - (yC-1));
+              const weight = wght(dX) * wght(dY);
+              colSum[0] += rgb[0] * weight;
+              colSum[1] += rgb[1] * weight;
+              colSum[2] += rgb[2] * weight;
+              colSum[3] += rgb[3] * weight;
+            }
+          }
+          // 색 합산
+          for (var c=0; c<4; c++) {
+            dstRow[x][c] = Math.min(255, colSum[c]);
+          }
+        }
+      }
+      return dst;
+    }
+  };
+})();
+
+/* 렌더링 함수 */
+const imgRender = (canvasId, imgSrc) => {
+  let w = imgSrc.w;
+  let h = imgSrc.h;
+  let canvas = document.getElementById(canvasId);
+  canvas.width = w;
+  canvas.height = h;
+  let ctx = canvas.getContext('2d');
+  let image = ctx.createImageData(canvas.width, canvas.height);
+  let data = image.data;
+  for (let x=0; x<w; x++) {
+    for (let y=0; y<h; y++) {
+      let p = (x + y * w) * 4;
+      let color = imgSrc[y][x];
+      data[p] = color[0];
+      data[p+1] = color[1];
+      data[p+2] = color[2];
+      data[p+3] = color[3];
+    }
+  }
+  ctx.fillColor = 'black';
+  ctx.fillRect(0, 0, w, h);
+  ctx.putImageData(image, 0, 0);
+};
+
+/* 확대/축소 함수 */
+const scale = () => {
+  let scale = 1;
+  let dscale = 0.5;
+  const run = (kind) => {
+    let dst;
+    if(kind == 1) dst = imgInterpolation.nearestNeighbor(img, scale, scale);
+    else if(kind == 2) dst = imgInterpolation.bilinear(img, scale, scale);
+    else if(kind == 3) dst = imgInterpolation.bicubic(img, scale, scale);
+    imgRender('scale', dst);	
+    document.getElementById("scaleValue").innerHTML = scale + "배";
+  };
+  return {
+    up: (kind) => {
+      scale += dscale;
+      if(scale > 10) scale = 10;
+      run(kind);
+    },
+    down: (kind) => {
+      scale -= dscale;
+      if(scale < 0.5) scale = 0.5;
+      run(kind);
+    }
+  };
+})();
+
+let img = imgSrcCreate(100, 100);
+imgRender('original', img);	
+imgRender('scale', img);	
+```
