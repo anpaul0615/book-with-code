@@ -193,3 +193,159 @@ function terrainSearch(arnd, nowX, nowY, goalX, goalY, mapW, mapH) {
 }
 ```
 
+
+## 코드스피츠 구현 (맵 생성 알고리즘)
+
+```javascript
+/* Xorshift 랜덤함수 */
+var Xors = function(n) {
+  var x, y, z, w;
+  // 시드
+  this.seed = function(s) {
+    x = 123456789
+    if (typeof s !== "undefined") x = s; 
+    y = 362436069; z = 521288629; w = 88675123;
+  }
+  // 랜덤
+  this.rand = function() {
+    var t;
+    t = x ^ (x << 11);
+    x = y; y = z; z = w;
+    return w = (w^(w>>19))^(t^(t>>8));
+  }
+  // 첫회 실행
+  this.seed(n);
+};
+
+/* 맵 설정값 */
+var map = {
+  w: 120,  // 가로 폭
+  h: 60,  // 높이
+  arr: [],  // 배열
+  stp: 10,  // 이동 비용의 스텝. 1~10.
+  key: 45,  // 조산운동의 키 포인트 수
+  deep: 1000, // 조산운동의 심도계소
+  seed: 0,  // 랜덤 시드
+  drwSz: 5, // 그림 크기
+  strtRtX: 0.9, // 시작위치 비율X
+  strtRtY: 0.3, // 시작위치 비율Y
+  goalRtX: 0.1, // 종료위치 비율X
+  goalRtY: 0.7, // 종료위치 비율Y
+  inW: function(x) {	// 좌표범위 가로
+    if (x < 0) return 0;
+    if (x >= this.w) return this.w - 1;
+    return x;
+  },
+  inH: function(y) {	// 좌표범위 세로
+    if (y < 0) return 0;
+    if (y >= this.h) return this.h - 1;
+    return y;
+  }
+};
+
+/* 맵 생성 */
+function mkMap(map) {
+  // 랜덤 시드를 설정
+  var xors = new Xors(map.seed);
+  // 가로 세로 2배로 맵을 초기화
+  var w = map.w;
+  var h = map.h;
+  var arr = map.arr;
+  for (var x = 0; x < w; x ++) {
+    arr[x] = [];
+    for (var y = 0; y < h * 2; y ++) {
+      arr[x][y] = 0;
+    }
+  }
+
+  // 맵 생성 처리
+  for (var i = 0; i < map.key; i ++) {
+    // 키 포인트 작성
+    var rX = xors.rand() % w;
+    var rY = xors.rand() % h;
+    var pos = {x: rX, y: rY};
+    // 맵 성장 처리
+    for (var j = 0; j < map.deep; j ++) {
+      mapGrwth(pos, rX, rY);
+    }
+  }
+
+  /* 맵 성장 */
+  function mapGrwth(pos, bsX, bsY) {
+    var mvR = xors.rand() % 10;
+    var mvX = 0, mvY = 0;
+    // 키 포인트의 이동 방향
+    switch (mvR) {
+    // 단순히 이동
+    case 0: case 1: mvX =  1; break;
+    case 2: case 3: mvX = -1; break;
+    case 4: case 5: mvY =  1; break;
+    case 6: case 7: mvY = -1; break;
+    // 중심으로 이동
+    case 8: mvX = (pos.x < bsX) ? 1
+          : (pos.x > bsX) ? -1 : 0; break;
+    case 9: mvY = (pos.y < bsY) ? 1
+          : (pos.y > bsY) ? -1 : 0; break;
+    }
+    // 킴 포인트의 위치를 이동
+    pos.x = map.inW(pos.x + mvX);
+    pos.y = map.inH(pos.y + mvY);
+    // 조산 활동
+    arr[pos.x][pos.y] += 1;
+  }
+
+  // 최고 고도 계산
+  var altMax = 1;	// 최고 고도
+  for (var x = 0; x < w; x ++) {
+    for (var y = 0; y < h; y ++) {
+      if (arr[x][y] > altMax) {
+        altMax = arr[x][y];
+      }
+    }
+  }
+  // 높이 조정
+  var sqrtAltMax = Math.sqrt(altMax);
+  for (var x = 0; x < w; x ++) {
+    for (var y = 0; y < h; y ++) {
+      var sqrt = Math.sqrt(arr[x][y]);
+      arr[x][y] = (sqrt / sqrtAltMax * map.stp)|0;
+      arr[x][y]++;
+      if (arr[x][y] > map.stp) arr[x][y] = map.stp;
+    }
+  }
+}
+
+/* 맵 그리기 */
+function drwMap(map) {
+  // 변수 초기화
+  var canvas = document.getElementById("canvas");
+  var cntxt = canvas.getContext("2d");
+  canvas.width = map.w * map.drwSz;
+  canvas.height = map.h * map.drwSz;
+  cntxt.font = "24px serif"
+  // 색 초기화
+  var colMin = {r: 192, g: 255, b: 64};
+  var colMax = {r:  80, g:  96, b: 32};
+  var colDif = {
+    r: colMax.r - colMin.r, 
+    g: colMax.g - colMin.g, 
+    b: colMax.b - colMin.b
+  };
+  // 맵 그리기 처리
+  for (var x = 0; x < map.w; x ++) {
+    for (var y = 0; y < map.h; y ++) {
+      var bs = map.arr[x][y] / map.stp;
+      var r = colMin.r + (colDif.r * bs)|0;
+      var g = colMin.g + (colDif.g * bs)|0;
+      var b = colMin.b + (colDif.b * bs)|0;
+      cntxt.fillStyle = "rgb("+r+","+g+","+b+")";
+      cntxt.fillRect(x * map.drwSz, y * map.drwSz
+        ,map.drwSz, map.drwSz);
+    }
+  }
+}
+
+mkMap(map);
+drwMap(map);
+```
+
