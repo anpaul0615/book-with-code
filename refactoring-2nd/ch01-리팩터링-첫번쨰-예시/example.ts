@@ -49,6 +49,25 @@ function statement(invoice: Invoice, plays: Plays) {
 
   for (let perf of invoice.performances) {
     const play = plays[perf.playID];
+    let thisAmount = amountFor(perf, play);
+
+    // 포인트를 지불한다
+    volumeCredits += Math.max(perf.audience - 30, 0);
+
+    // 희극관객 5명마다 추가포인트를 제공한다
+    if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5);
+
+    // 청구내역을 출력한다
+    result += `  ${play.name}: ${format(thisAmount / 100)} (${perf.audience}석)\n`
+    totalAmount += thisAmount;
+  }
+
+  result += `총액: ${format(totalAmount / 100)}\n`
+  result += `적립포인트: ${volumeCredits}점\n`
+
+  return result;
+
+  function amountFor(perf: Invoice['performances'][number], play: Plays[keyof Plays]) {
     let thisAmount = 0;
 
     switch (play.type) {
@@ -69,21 +88,8 @@ function statement(invoice: Invoice, plays: Plays) {
           throw new Error(`알수없는 장르: ${play.type}`)
     }
 
-    // 포인트를 지불한다
-    volumeCredits += Math.max(perf.audience - 30, 0);
-
-    // 희극관객 5명마다 추가포인트를 제공한다
-    if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5);
-
-    // 청구내역을 출력한다
-    result += `  ${play.name}: ${format(thisAmount / 100)} (${perf.audience}석)\n`
-    totalAmount += thisAmount;
+    return thisAmount;
   }
-
-  result += `총액: ${format(totalAmount / 100)}\n`
-  result += `적립포인트: ${volumeCredits}점\n`
-
-  return result;
 }
 
 console.log(
