@@ -1,8 +1,5 @@
 type Plays = {
-  [k:string]: {
-    name: string;
-    type: string;
-  };
+  [k:string]: Play;
 };
 const plays: Plays = {
   "hamlet": {"name": "Hamlet", "type": "tragedy"},
@@ -12,10 +9,7 @@ const plays: Plays = {
 
 type Invoice = {
   customer: string;
-  performances: {
-    playID: string
-    audience: number
-  }[];
+  performances: PlayPerformance[];
 };
 const invoices: Invoice[] = [
   {
@@ -39,7 +33,21 @@ const invoices: Invoice[] = [
 
 type StatementData = {
   customer: Invoice['customer'];
-  performances: Invoice['performances'];
+  performances: EnrichPlayPerformance[];
+};
+
+type Play = {
+  name: string;
+  type: string;
+};
+
+type PlayPerformance = {
+  playID: string;
+  audience: number;
+};
+
+type EnrichPlayPerformance = PlayPerformance & {
+  play: Play;
 };
 
 /* main function */
@@ -51,9 +59,17 @@ function statement(invoice: Invoice, plays: Plays) {
   return renderPlainText(statementData, plays);
   
   /* inline function */
-  function enrichPerformance(aPerfomance: Invoice['performances'][number]) {
-    const result = Object.assign({}, aPerfomance);
+  function enrichPerformance(aPerfomance: PlayPerformance) {
+    const result: EnrichPlayPerformance = {
+      ...aPerfomance,
+      play: playFor(aPerfomance)
+    };
     return result;
+  }
+
+  /* inline function */
+  function playFor(aPerfomance: PlayPerformance) {
+    return plays[aPerfomance.playID];
   }
 }
 
@@ -62,7 +78,7 @@ function renderPlainText(data: StatementData, plays: Plays) {
   let result = `청구내역 (고객명: ${data.customer})\n`;
   for (let perf of data.performances) {
     // 청구내역을 출력한다
-    result += `  ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`
+    result += `  ${perf.play.name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`
   }
 
   result += `총액: ${usd(totalAmount())}\n`
@@ -71,10 +87,10 @@ function renderPlainText(data: StatementData, plays: Plays) {
   return result;
 
   /* inline function */
-  function amountFor(aPerfomance: Invoice['performances'][number]) {
+  function amountFor(aPerfomance: EnrichPlayPerformance) {
     let result = 0;
   
-    switch (playFor(aPerfomance).type) {
+    switch (aPerfomance.play.type) {
       case "tragedy":
         result = 40_000;
         if (aPerfomance.audience > 30) {
@@ -89,26 +105,20 @@ function renderPlainText(data: StatementData, plays: Plays) {
         result += 300 * aPerfomance.audience;
         break;
       default:
-        throw new Error(`알수없는 장르: ${playFor(aPerfomance).type}`)
+        throw new Error(`알수없는 장르: ${aPerfomance.play.type}`)
     }
   
     return result;
   }
-
   /* inline function */
-  function playFor(aPerfomance: Invoice['performances'][number]) {
-    return plays[aPerfomance.playID];
-  }
-
-  /* inline function */
-  function volumeCreditsFor(aPerfomance: Invoice['performances'][number]) {
+  function volumeCreditsFor(aPerfomance: EnrichPlayPerformance) {
     let result = 0;
   
     // 포인트를 지불한다
     result += Math.max(aPerfomance.audience - 30, 0);
   
     // 희극관객 5명마다 추가포인트를 제공한다
-    if ("comedy" === playFor(aPerfomance).type) {
+    if ("comedy" === aPerfomance.play.type) {
       result += Math.floor(aPerfomance.audience / 5);
     }
   
