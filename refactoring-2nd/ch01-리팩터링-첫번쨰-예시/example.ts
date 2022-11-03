@@ -49,6 +49,7 @@ type PlayPerformance = {
 type EnrichPlayPerformance = PlayPerformance & {
   play: Play;
   amount?: number;
+  volumeCredits?: number;
 };
 
 /* main function */
@@ -66,6 +67,7 @@ function statement(invoice: Invoice, plays: Plays) {
       play: playFor(aPerfomance),
     };
     result.amount = amountFor(result)
+    result.volumeCredits = volumeCreditsFor(result)
 
     return result;
   }
@@ -99,6 +101,21 @@ function statement(invoice: Invoice, plays: Plays) {
   
     return result;
   }
+
+  /* inline function */
+  function volumeCreditsFor(aPerfomance: EnrichPlayPerformance) {
+    let result = 0;
+  
+    // 포인트를 지불한다
+    result += Math.max(aPerfomance.audience - 30, 0);
+  
+    // 희극관객 5명마다 추가포인트를 제공한다
+    if ("comedy" === aPerfomance.play.type) {
+      result += Math.floor(aPerfomance.audience / 5);
+    }
+  
+    return result;
+  }
 }
 
 /* sub function */
@@ -115,21 +132,6 @@ function renderPlainText(data: StatementData, plays: Plays) {
   return result;
 
   /* inline function */
-  function volumeCreditsFor(aPerfomance: EnrichPlayPerformance) {
-    let result = 0;
-  
-    // 포인트를 지불한다
-    result += Math.max(aPerfomance.audience - 30, 0);
-  
-    // 희극관객 5명마다 추가포인트를 제공한다
-    if ("comedy" === aPerfomance.play.type) {
-      result += Math.floor(aPerfomance.audience / 5);
-    }
-  
-    return result;
-  }
-
-  /* inline function */
   function usd(aNumber: number) {
     return new Intl.NumberFormat(
       "en-US", 
@@ -141,7 +143,7 @@ function renderPlainText(data: StatementData, plays: Plays) {
   function totalVolumeCredits() {
     let result = 0;
     for (let perf of data.performances) {
-      result += volumeCreditsFor(perf);
+      result += perf.volumeCredits!;
     }
     return result;
   }
