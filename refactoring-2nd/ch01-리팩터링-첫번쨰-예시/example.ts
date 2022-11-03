@@ -37,15 +37,24 @@ const invoices: Invoice[] = [
   }
 ];
 
+type StatementData = {
+  customer: Invoice['customer'];
+  performances: Invoice['performances'];
+};
+
 /* main function */
 function statement(invoice: Invoice, plays: Plays) {
-  return renderPlainText(invoice, plays);
+  const statementData: StatementData = {
+    customer: invoice.customer,
+    performances: invoice.performances,
+  };
+  return renderPlainText(statementData, plays);
 }
 
 /* sub function */
-function renderPlainText(invoice: Invoice, plays: Plays) {
-  let result = `청구내역 (고객명: ${invoice.customer})\n`;
-  for (let perf of invoice.performances) {
+function renderPlainText(data: StatementData, plays: Plays) {
+  let result = `청구내역 (고객명: ${data.customer})\n`;
+  for (let perf of data.performances) {
     // 청구내역을 출력한다
     result += `  ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`
   }
@@ -111,7 +120,7 @@ function renderPlainText(invoice: Invoice, plays: Plays) {
   /* inline function */
   function totalVolumeCredits() {
     let result = 0;
-    for (let perf of invoice.performances) {
+    for (let perf of data.performances) {
       result += volumeCreditsFor(perf);
     }
     return result;
@@ -120,7 +129,7 @@ function renderPlainText(invoice: Invoice, plays: Plays) {
   /* inline function */
   function totalAmount() {
     let result = 0;
-    for (let perf of invoice.performances) {
+    for (let perf of data.performances) {
       result += amountFor(perf);
     }
     return result;
