@@ -37,6 +37,7 @@ const invoices: Invoice[] = [
   }
 ];
 
+/* main function */
 function statement(invoice: Invoice, plays: Plays) {
   let result = `청구내역 (고객명: ${invoice.customer})\n`;
   for (let perf of invoice.performances) {
@@ -49,6 +50,7 @@ function statement(invoice: Invoice, plays: Plays) {
 
   return result;
 
+  /* inline function */
   function amountFor(aPerfomance: Invoice['performances'][number]) {
     let result = 0;
   
@@ -73,10 +75,12 @@ function statement(invoice: Invoice, plays: Plays) {
     return result;
   }
 
+  /* inline function */
   function playFor(aPerfomance: Invoice['performances'][number]) {
     return plays[aPerfomance.playID];
   }
 
+  /* inline function */
   function volumeCreditsFor(aPerfomance: Invoice['performances'][number]) {
     let result = 0;
   
@@ -91,6 +95,7 @@ function statement(invoice: Invoice, plays: Plays) {
     return result;
   }
 
+  /* inline function */
   function usd(aNumber: number) {
     return new Intl.NumberFormat(
       "en-US", 
@@ -98,6 +103,7 @@ function statement(invoice: Invoice, plays: Plays) {
     ).format(aNumber / 100);
   }
 
+  /* inline function */
   function totalVolumeCredits() {
     let result = 0;
     for (let perf of invoice.performances) {
@@ -106,6 +112,7 @@ function statement(invoice: Invoice, plays: Plays) {
     return result;
   }
 
+  /* inline function */
   function totalAmount() {
     let result = 0;
     for (let perf of invoice.performances) {
