@@ -26,6 +26,20 @@ export class PerformanceCalculator {
   
     return result;
   }
+
+  get volumeCredits() {
+    let result = 0;
+  
+    // 포인트를 지불한다
+    result += Math.max(this.performance.audience - 30, 0);
+  
+    // 희극관객 5명마다 추가포인트를 제공한다
+    if ("comedy" === this.play.type) {
+      result += Math.floor(this.performance.audience / 5);
+    }
+  
+    return result;
+  }
 }
 
 export function createStatementData(invoice: Invoice, plays: Plays) {
@@ -46,8 +60,8 @@ export function createStatementData(invoice: Invoice, plays: Plays) {
       ...aPerfomance,
       play: calculator.play,
       amount: calculator.amount,
+      volumeCredits: calculator.volumeCredits,
     };
-    result.volumeCredits = volumeCreditsFor(result)
   
     return result;
   }
@@ -58,23 +72,8 @@ export function createStatementData(invoice: Invoice, plays: Plays) {
   }
 
   /* inline function */
-  function volumeCreditsFor(aPerfomance: EnrichPlayPerformance) {
-    let result = 0;
-  
-    // 포인트를 지불한다
-    result += Math.max(aPerfomance.audience - 30, 0);
-  
-    // 희극관객 5명마다 추가포인트를 제공한다
-    if ("comedy" === aPerfomance.play.type) {
-      result += Math.floor(aPerfomance.audience / 5);
-    }
-  
-    return result;
-  }
-
-  /* inline function */
   function totalVolumeCredits(data: StatementData) { 
-    return data.performances.reduce((total, p) => total + p.volumeCredits!, 0);
+    return data.performances.reduce((total, p) => total + p.volumeCredits, 0);
   }
 
   /* inline function */

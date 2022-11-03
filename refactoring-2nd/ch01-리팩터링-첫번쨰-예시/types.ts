@@ -27,5 +27,5 @@ export type PlayPerformance = {
 export type EnrichPlayPerformance = PlayPerformance & {
   play: Play;
   amount: number;
-  volumeCredits?: number;
+  volumeCredits: number;
 };
