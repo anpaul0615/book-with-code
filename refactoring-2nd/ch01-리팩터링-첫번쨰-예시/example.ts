@@ -48,6 +48,7 @@ type PlayPerformance = {
 
 type EnrichPlayPerformance = PlayPerformance & {
   play: Play;
+  amount?: number;
 };
 
 /* main function */
@@ -62,8 +63,10 @@ function statement(invoice: Invoice, plays: Plays) {
   function enrichPerformance(aPerfomance: PlayPerformance) {
     const result: EnrichPlayPerformance = {
       ...aPerfomance,
-      play: playFor(aPerfomance)
+      play: playFor(aPerfomance),
     };
+    result.amount = amountFor(result)
+
     return result;
   }
 
@@ -71,23 +74,9 @@ function statement(invoice: Invoice, plays: Plays) {
   function playFor(aPerfomance: PlayPerformance) {
     return plays[aPerfomance.playID];
   }
-}
-
-/* sub function */
-function renderPlainText(data: StatementData, plays: Plays) {
-  let result = `청구내역 (고객명: ${data.customer})\n`;
-  for (let perf of data.performances) {
-    // 청구내역을 출력한다
-    result += `  ${perf.play.name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`
-  }
-
-  result += `총액: ${usd(totalAmount())}\n`
-  result += `적립포인트: ${totalVolumeCredits()}점\n`
-
-  return result;
-
+  
   /* inline function */
-  function amountFor(aPerfomance: EnrichPlayPerformance) {
+  function amountFor(aPerfomance: PlayPerformance & { play: Play }) {
     let result = 0;
   
     switch (aPerfomance.play.type) {
@@ -110,6 +99,21 @@ function renderPlainText(data: StatementData, plays: Plays) {
   
     return result;
   }
+}
+
+/* sub function */
+function renderPlainText(data: StatementData, plays: Plays) {
+  let result = `청구내역 (고객명: ${data.customer})\n`;
+  for (let perf of data.performances) {
+    // 청구내역을 출력한다
+    result += `  ${perf.play.name}: ${usd(perf.amount!)} (${perf.audience}석)\n`
+  }
+
+  result += `총액: ${usd(totalAmount())}\n`
+  result += `적립포인트: ${totalVolumeCredits()}점\n`
+
+  return result;
+
   /* inline function */
   function volumeCreditsFor(aPerfomance: EnrichPlayPerformance) {
     let result = 0;
@@ -146,7 +150,7 @@ function renderPlainText(data: StatementData, plays: Plays) {
   function totalAmount() {
     let result = 0;
     for (let perf of data.performances) {
-      result += amountFor(perf);
+      result += perf.amount!;
     }
     return result;
   }
