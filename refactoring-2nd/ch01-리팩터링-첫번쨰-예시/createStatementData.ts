@@ -1,7 +1,7 @@
 import type { Invoice, Plays, Play, PlayPerformance, EnrichPlayPerformance, StatementData } from './types';
 
 export class PerformanceCalculator {
-  constructor(private aPerformance: PlayPerformance) {}
+  constructor(private performance: PlayPerformance, public play: Play) {}
 }
 
 export function createStatementData(invoice: Invoice, plays: Plays) {
@@ -16,11 +16,11 @@ export function createStatementData(invoice: Invoice, plays: Plays) {
 
   /* inline function */
   function enrichPerformance(aPerfomance: PlayPerformance) {
-    const calculator = new PerformanceCalculator(aPerfomance);
+    const calculator = new PerformanceCalculator(aPerfomance, playFor(aPerfomance));
 
     const result: EnrichPlayPerformance = {
       ...aPerfomance,
-      play: playFor(aPerfomance),
+      play: calculator.play,
     };
     result.amount = amountFor(result)
     result.volumeCredits = volumeCreditsFor(result)
