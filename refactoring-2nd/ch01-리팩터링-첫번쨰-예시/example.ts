@@ -39,6 +39,11 @@ const invoices: Invoice[] = [
 
 /* main function */
 function statement(invoice: Invoice, plays: Plays) {
+  return renderPlainText(invoice, plays);
+}
+
+/* sub function */
+function renderPlainText(invoice: Invoice, plays: Plays) {
   let result = `청구내역 (고객명: ${invoice.customer})\n`;
   for (let perf of invoice.performances) {
     // 청구내역을 출력한다
