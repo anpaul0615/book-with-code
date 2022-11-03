@@ -1,18 +1,14 @@
 import type { Invoice, Plays, Play, PlayPerformance, EnrichPlayPerformance, StatementData } from './types';
 
 export class PerformanceCalculator {
-  constructor(private performance: PlayPerformance, public play: Play) {}
+  constructor(protected performance: PlayPerformance, public play: Play) {}
   
   get amount() {
     let result = 0;
   
     switch (this.play.type) {
       case "tragedy":
-        result = 40_000;
-        if (this.performance.audience > 30) {
-          result += 1000 * (this.performance.audience - 30);
-        }
-        break;
+        throw new Error(`오류발생`); // TragedyCalculator 로 유도
       case "comedy":
         result = 30_000;
         if (this.performance.audience > 20) {
@@ -42,7 +38,15 @@ export class PerformanceCalculator {
   }
 }
 
-export class TragedyCalculator extends PerformanceCalculator {}
+export class TragedyCalculator extends PerformanceCalculator {
+  get amount() {
+    let result = 40_000;
+    if (this.performance.audience > 30) {
+      result += 1000 * (this.performance.audience - 30);
+    }
+    return result;
+  }
+}
 
 export class ComedyCalculator extends PerformanceCalculator {}
 
