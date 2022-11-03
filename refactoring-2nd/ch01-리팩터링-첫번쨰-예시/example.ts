@@ -67,28 +67,28 @@ function statement(invoice: Invoice, plays: Plays) {
 
   return result;
 
-  function amountFor(perf: Invoice['performances'][number], play: Plays[keyof Plays]) {
-    let thisAmount = 0;
-
+  function amountFor(aPerfomance: Invoice['performances'][number], play: Plays[keyof Plays]) {
+    let result = 0;
+  
     switch (play.type) {
       case "tragedy":
-        thisAmount = 40_000;
-        if (perf.audience > 30) {
-          thisAmount += 1000 * (perf.audience - 30);
+        result = 40_000;
+        if (aPerfomance.audience > 30) {
+          result += 1000 * (aPerfomance.audience - 30);
         }
         break;
       case "comedy":
-        thisAmount = 30_000;
-        if (perf.audience > 20) {
-          thisAmount += 10_000 + 500 * (perf.audience - 20);
+        result = 30_000;
+        if (aPerfomance.audience > 20) {
+          result += 10_000 + 500 * (aPerfomance.audience - 20);
         }
-        thisAmount += 300 * perf.audience;
+        result += 300 * aPerfomance.audience;
         break;
       default:
-          throw new Error(`알수없는 장르: ${play.type}`)
+        throw new Error(`알수없는 장르: ${play.type}`)
     }
-
-    return thisAmount;
+  
+    return result;
   }
 }
 
