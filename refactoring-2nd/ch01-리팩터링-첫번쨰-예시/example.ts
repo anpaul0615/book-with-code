@@ -46,9 +46,15 @@ type StatementData = {
 function statement(invoice: Invoice, plays: Plays) {
   const statementData: StatementData = {
     customer: invoice.customer,
-    performances: invoice.performances,
+    performances: invoice.performances.map(enrichPerformance),
   };
   return renderPlainText(statementData, plays);
+  
+  /* inline function */
+  function enrichPerformance(aPerfomance: Invoice['performances'][number]) {
+    const result = Object.assign({}, aPerfomance);
+    return result;
+  }
 }
 
 /* sub function */
