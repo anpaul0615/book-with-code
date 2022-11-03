@@ -10,12 +10,7 @@ export class PerformanceCalculator {
       case "tragedy":
         throw new Error(`오류발생`); // TragedyCalculator 로 유도
       case "comedy":
-        result = 30_000;
-        if (this.performance.audience > 20) {
-          result += 10_000 + 500 * (this.performance.audience - 20);
-        }
-        result += 300 * this.performance.audience;
-        break;
+        throw new Error(`오류발생`); // ComedyCalculator 로 유도
       default:
         throw new Error(`알수없는 장르: ${this.play.type}`)
     }
@@ -48,7 +43,16 @@ export class TragedyCalculator extends PerformanceCalculator {
   }
 }
 
-export class ComedyCalculator extends PerformanceCalculator {}
+export class ComedyCalculator extends PerformanceCalculator {
+  get amount() {
+    let result = 30_000;
+    if (this.performance.audience > 20) {
+      result += 10_000 + 500 * (this.performance.audience - 20);
+    }
+    result += 300 * this.performance.audience;
+    return result;
+  }
+}
 
 export function createPerformanceCalculator(performance: PlayPerformance, play: Play) {
   switch(play.type) {
