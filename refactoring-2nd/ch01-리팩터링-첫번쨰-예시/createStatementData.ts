@@ -1,22 +1,9 @@
 import type { Invoice, Plays, Play, PlayPerformance, EnrichPlayPerformance, StatementData } from './types';
 
-export class PerformanceCalculator {
+export abstract class PerformanceCalculator {
   constructor(protected performance: PlayPerformance, public play: Play) {}
   
-  get amount() {
-    let result = 0;
-  
-    switch (this.play.type) {
-      case "tragedy":
-        throw new Error(`오류발생`); // TragedyCalculator 로 유도
-      case "comedy":
-        throw new Error(`오류발생`); // ComedyCalculator 로 유도
-      default:
-        throw new Error(`알수없는 장르: ${this.play.type}`)
-    }
-  
-    return result;
-  }
+  abstract get amount(): number
 
   get volumeCredits() {
     let result = 0;
