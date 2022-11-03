@@ -42,8 +42,17 @@ export class PerformanceCalculator {
   }
 }
 
+export class TragedyCalculator extends PerformanceCalculator {}
+
+export class ComedyCalculator extends PerformanceCalculator {}
+
 export function createPerformanceCalculator(performance: PlayPerformance, play: Play) {
-  return new PerformanceCalculator(performance, play);
+  switch(play.type) {
+    case "tragedy": return new TragedyCalculator(performance, play);
+    case "comedy": return new ComedyCalculator(performance, play);
+    default:
+      throw new Error(`알수없는 장르: ${play.type}`);
+  }
 }
 
 export function createStatementData(invoice: Invoice, plays: Plays) {
