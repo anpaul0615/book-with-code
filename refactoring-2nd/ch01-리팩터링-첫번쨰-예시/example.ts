@@ -56,15 +56,20 @@ type EnrichPlayPerformance = PlayPerformance & {
 
 /* main function */
 function statement(invoice: Invoice, plays: Plays) {
+  return renderPlainText(createStatementData(invoice, plays));
+}
+
+/* sub function */
+function createStatementData(invoice: Invoice, plays: Plays) {
   const statementData: StatementData = {
     customer: invoice.customer,
     performances: invoice.performances.map(enrichPerformance),
   };
   statementData.totalVolumeCredits = totalVolumeCredits(statementData);
   statementData.totalAmount = totalAmount(statementData);
-
-  return renderPlainText(statementData, plays);
   
+  return statementData;
+
   /* inline function */
   function enrichPerformance(aPerfomance: PlayPerformance) {
     const result: EnrichPlayPerformance = {
@@ -73,7 +78,7 @@ function statement(invoice: Invoice, plays: Plays) {
     };
     result.amount = amountFor(result)
     result.volumeCredits = volumeCreditsFor(result)
-
+  
     return result;
   }
 
@@ -81,7 +86,7 @@ function statement(invoice: Invoice, plays: Plays) {
   function playFor(aPerfomance: PlayPerformance) {
     return plays[aPerfomance.playID];
   }
-  
+
   /* inline function */
   function amountFor(aPerfomance: PlayPerformance & { play: Play }) {
     let result = 0;
@@ -121,7 +126,7 @@ function statement(invoice: Invoice, plays: Plays) {
   
     return result;
   }
-  
+
   /* inline function */
   function totalVolumeCredits(data: StatementData) { 
     return data.performances.reduce((total, p) => total + p.volumeCredits!, 0);
@@ -134,7 +139,7 @@ function statement(invoice: Invoice, plays: Plays) {
 }
 
 /* sub function */
-function renderPlainText(data: StatementData, plays: Plays) {
+function renderPlainText(data: StatementData) {
   let result = `청구내역 (고객명: ${data.customer})\n`;
   for (let perf of data.performances) {
     // 청구내역을 출력한다
