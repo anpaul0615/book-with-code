@@ -34,6 +34,8 @@ const invoices: Invoice[] = [
 type StatementData = {
   customer: Invoice['customer'];
   performances: EnrichPlayPerformance[];
+  totalVolumeCredits?: number;
+  totalAmount?: number;
 };
 
 type Play = {
@@ -58,6 +60,9 @@ function statement(invoice: Invoice, plays: Plays) {
     customer: invoice.customer,
     performances: invoice.performances.map(enrichPerformance),
   };
+  statementData.totalVolumeCredits = totalVolumeCredits(statementData);
+  statementData.totalAmount = totalAmount(statementData);
+
   return renderPlainText(statementData, plays);
   
   /* inline function */
@@ -116,6 +121,24 @@ function statement(invoice: Invoice, plays: Plays) {
   
     return result;
   }
+  
+  /* inline function */
+  function totalVolumeCredits(data: StatementData) { 
+    let result = 0;
+    for (let perf of data.performances) {
+      result += perf.volumeCredits!;
+    }
+    return result;
+  }
+
+  /* inline function */
+  function totalAmount(data: StatementData) {
+    let result = 0;
+    for (let perf of data.performances) {
+      result += perf.amount!;
+    }
+    return result;
+  }
 }
 
 /* sub function */
@@ -126,8 +149,8 @@ function renderPlainText(data: StatementData, plays: Plays) {
     result += `  ${perf.play.name}: ${usd(perf.amount!)} (${perf.audience}석)\n`
   }
 
-  result += `총액: ${usd(totalAmount())}\n`
-  result += `적립포인트: ${totalVolumeCredits()}점\n`
+  result += `총액: ${usd(data.totalAmount!)}\n`
+  result += `적립포인트: ${data.totalVolumeCredits!}점\n`
 
   return result;
 
@@ -137,24 +160,6 @@ function renderPlainText(data: StatementData, plays: Plays) {
       "en-US", 
       { style:"currency", currency:"USD", minimumFractionDigits:2 }
     ).format(aNumber / 100);
-  }
-
-  /* inline function */
-  function totalVolumeCredits() {
-    let result = 0;
-    for (let perf of data.performances) {
-      result += perf.volumeCredits!;
-    }
-    return result;
-  }
-
-  /* inline function */
-  function totalAmount() {
-    let result = 0;
-    for (let perf of data.performances) {
-      result += perf.amount!;
-    }
-    return result;
   }
 }
 
