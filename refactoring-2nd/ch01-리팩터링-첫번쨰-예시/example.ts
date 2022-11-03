@@ -48,7 +48,7 @@ function statement(invoice: Invoice, plays: Plays) {
   ).format;
 
   for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
+    const play = playFor(perf);
     let thisAmount = amountFor(perf, play);
 
     // 포인트를 지불한다
@@ -89,6 +89,10 @@ function statement(invoice: Invoice, plays: Plays) {
     }
   
     return result;
+  }
+
+  function playFor(aPerfomance: Invoice['performances'][number]) {
+    return plays[aPerfomance.playID];
   }
 }
 
