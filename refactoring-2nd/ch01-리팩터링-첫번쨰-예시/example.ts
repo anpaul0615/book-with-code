@@ -1,5 +1,5 @@
 import type { Invoice, Plays } from './types';
-import { statement } from './statement';
+import { statement, htmlStatement } from './statement';
 
 const plays: Plays = {
   "hamlet": {"name": "Hamlet", "type": "tragedy"},
@@ -28,4 +28,8 @@ const invoices: Invoice[] = [
 
 console.log(
   statement(invoices[0], plays)
+);
+
+console.log(
+  htmlStatement(invoices[0], plays)
 );
